@@ -19,6 +19,7 @@
           <b-card no-body class="mb-1" header="The User">
             <b-card-body class="text-center">
               <b-avatar variant="info" size="4rem" class="mb-2"></b-avatar>
+              <p>Name: {{ user.name }}</p>
               <p>Games: {{ user.games }}</p>
               <p>Win Rate: {{ user.winRate }}%</p>
             </b-card-body>
@@ -33,7 +34,12 @@
   
 
     <script setup lang="ts">
-    import { ref } from 'vue';
+    import axios from 'axios';
+    import { onMounted, ref } from 'vue';
+
+    onMounted(() => {
+      fetchUserInfo('user1')
+    });
     const rooms = ref([
       { id: 1, number: 1, player: 'Alice', status: 'waiting' },
       { id: 2, number: 2, player: 'Bob', status: 'playing' },
@@ -41,9 +47,25 @@
     ]);
     const user = ref({
       avatar: '../assets/images.png',
+      name: 'Alice',
       games: 10,
       winRate: 70,
     });
+
+
+    async function fetchUserInfo(username: string) {
+      try {
+        const response = await axios.get(`/api/users/${username}`);
+        user.value.name = response.data.username;
+        console.log('User info:', response.data);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error(error.message);
+        } else {
+          console.error("Failed to fetch user info:", error);
+        }
+      }
+    }
     </script>
   
   <style scoped>
