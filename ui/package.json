@@ -12,6 +12,7 @@
     "@vue/compat": "^3.4.15",
     "axios": "^1.6.8",
     "bootstrap-vue": "^2.23.1",
+    "socket.io-client": "^4.7.5",
     "vue": "^3.4.15",
     "vue-router": "^4.3.0"
   },

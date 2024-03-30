@@ -32,7 +32,8 @@
 
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import { GameSocket } from '../gameSocket'; 
 
 const user1 = ref({
   avatar: '../assets/images.png',
@@ -47,5 +48,31 @@ const user2 = ref({
   games: 20,
   winRate: 80,
 });
+
+
+
+
+const gameSocket = new GameSocket('http://localhost:8181');
+
+onMounted(() => {
+  gameSocket.connect('your_jwt_token_here');
+  gameSocket.joinRoom('roomId1', "User"+Math.floor(Math.random() * 1000));
+
+  gameSocket.onRoomInfo((roomInfo) => {
+    console.log('Room Info:', roomInfo);
+    // interface User {
+    // id: string;
+    // username: string;
+    //}
+  user1.value.name = roomInfo.users[0].username;
+  if (roomInfo.users.length > 1) {
+    user2.value.name = roomInfo.users[1].username;
+  } else {
+    user2.value.name = 'Empty';
+  }
+  });
+
+});
+
 
 </script>

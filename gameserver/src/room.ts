@@ -11,8 +11,12 @@ export class Room {
       this.roomId = roomId;
     }
   
-    addUser(user: User): void {
+    addUser(user: User): Boolean {
+      if (this.users.length == 2) {
+        return false;
+      }
       this.users.push(user);
+      return true
     }
   
     removeUser(userId: string): void {

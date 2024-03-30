@@ -3,7 +3,7 @@ import { AuthService } from './AuthService';
 import { Room } from './room';
 import http from 'http';
 import { Socket } from "dgram";
-
+const port = 8181;
 export class GameServer {
   private io: Server;
   private authService: AuthService = new AuthService();
@@ -12,11 +12,15 @@ export class GameServer {
   constructor(io: Server) {
     this.io = io;
     this.io.on('connection', (socket) => {
-      socket.on('joinRoom', (token: string, roomId: string) => {
+      console.log('Client connected:', socket.id);
+      socket.on('joinRoom', (req) => {
+        const { token, roomId, username } = req;
         if (!this.authService.verifyToken(token)) {
           socket.emit('error', 'Authentication failed');
           return;
         }
+        console.log('User joined room:', roomId);
+        console.log('Username:', username);
 
         if (!this.rooms.has(roomId)) {
           this.rooms.set(roomId, new Room(roomId));
@@ -27,8 +31,11 @@ export class GameServer {
           socket.emit('error', 'Room not found');
           return;
         }
-        const user = { id: socket.id, username: 'example' }; // Get username from decoded token
-        room.addUser(user);
+        const user = { id: socket.id, username: username }; // Get username from decoded token
+        if (!room.addUser(user)) {
+          socket.emit('error', 'Room is full');
+          return;
+        }
 
         socket.join(roomId);
         socket.emit('roomInfo', { roomId, users: room.getUsers() });
@@ -57,4 +64,11 @@ export class GameServer {
 
 
 const server = http.createServer();
-const gameServer = new GameServer(new Server(server));
+const gameServer = new GameServer(new Server(server, {
+  cors: {
+    origin: "*", 
+    methods: ["GET", "POST"], 
+  }
+}));
+server.listen(port)
+console.log('Server listening on port', port);
