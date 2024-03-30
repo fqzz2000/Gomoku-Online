@@ -1,4 +1,4 @@
-import { Gomoku } from '../../src/gomoku/gomoku'
+import { Gomoku } from '../../src/gomoku'
 import 'mocha';
 import { expect } from 'chai';
 
