@@ -7,11 +7,17 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 import App from './App.vue'
 import LobbyPage from './components/LobbyPage.vue'
+import RoomPage from './components/RoomPage.vue'
 
 const routes = [
     {
-    path: '/',
-    component: LobbyPage
+        path: '/',
+        component: LobbyPage
+    },
+    {
+        path: '/room',
+        component: RoomPage
+
     }
 ]
 
