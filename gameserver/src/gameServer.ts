@@ -39,7 +39,7 @@ export class GameServer {
 
         socket.join(roomId);
         // socket.emit('roomInfo', { roomId, users: room.getUsers() });
-        this.io.to(roomId).emit('roomInfo', { roomId, users: room.getUsers() });
+        this.io.to(roomId).emit('roomInfo', { roomId: roomId, users: room.getUsers() });
       });
       
       socket.on("leaveRoom", (req) => {
@@ -56,7 +56,7 @@ export class GameServer {
         }
         socket.leave(roomId);
         room.removeUser(socket.id);
-        this.io.to(roomId).emit('roomInfo', { roomId, users: room.getUsers() });
+        this.io.to(roomId).emit('roomInfo', { roomId: roomId, users: room.getUsers() });
       } );
     });
     
