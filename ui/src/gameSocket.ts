@@ -48,6 +48,14 @@ export class GameSocket {
     }
 
     /**
+     * Leaves the room with the specified ID.
+     * @param roomId The ID of the room to leave.
+     */
+    public leaveRoom(roomId: string): void {
+        this.socket.emit('leaveRoom', {token:"placeholder",roomId: roomId});
+    }
+
+    /**
      * Registers a callback function to be called when room information is received.
      * @param callback The callback function to be called with the room information.
      */

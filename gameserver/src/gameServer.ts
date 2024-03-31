@@ -38,25 +38,26 @@ export class GameServer {
         }
 
         socket.join(roomId);
-        socket.emit('roomInfo', { roomId, users: room.getUsers() });
-
-        socket.to(roomId).emit('userJoined', user);
+        // socket.emit('roomInfo', { roomId, users: room.getUsers() });
+        this.io.to(roomId).emit('roomInfo', { roomId, users: room.getUsers() });
       });
       
-      socket.on('disconnect', (token:string, roomId: string) => {
+      socket.on("leaveRoom", (req) => {
+        const { token, roomId } = req;
         if (!this.authService.verifyToken(token)) {
           socket.emit('error', 'Authentication failed');
           return;
         }
-
+        console.log('User left room:', roomId);
         const room = this.rooms.get(roomId);
         if (room === undefined) {
           socket.emit('error', 'Room not found');
           return;
         }
+        socket.leave(roomId);
         room.removeUser(socket.id);
-        socket.to(roomId).emit('roomInfo', { roomId, users: room.getUsers() });
-      });
+        this.io.to(roomId).emit('roomInfo', { roomId, users: room.getUsers() });
+      } );
     });
     
   }

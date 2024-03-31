@@ -9,6 +9,7 @@
         <b-button variant="success" class="w-25 mb-4">Start</b-button>
             <b-avatar :src="user2.avatar" size="6rem" class="mb-2"></b-avatar>
             <h2 class="mb-2">{{ user2.name }}</h2>
+            <b-button variant="danger" class="w-25" @click="leaveRoom">Leave</b-button>
         </b-col>
   
         <!-- Profile/Chat Section -->
@@ -28,12 +29,16 @@
         </b-col>
       </b-row>
     </b-container>
+
 </template>
 
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { GameSocket } from '../gameSocket'; 
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const user1 = ref({
   avatar: '../assets/images.png',
@@ -55,11 +60,10 @@ const user2 = ref({
 const gameSocket = new GameSocket('http://localhost:8181');
 
 onMounted(() => {
-  gameSocket.connect('your_jwt_token_here');
-  gameSocket.joinRoom('roomId1', "User"+Math.floor(Math.random() * 1000));
 
+  gameSocket.connect('your_jwt_token_here');
   gameSocket.onRoomInfo((roomInfo) => {
-    console.log('Room Info:', roomInfo);
+    alert('Room Info: ' + JSON.stringify(roomInfo));
     // interface User {
     // id: string;
     // username: string;
@@ -72,7 +76,14 @@ onMounted(() => {
   }
   });
 
+  gameSocket.joinRoom('roomId1', "User"+Math.floor(Math.random() * 1000));
 });
+
+function leaveRoom() {
+  gameSocket.leaveRoom("roomId1");
+  router.push('/');
+  gameSocket.disconnect();
+}
 
 
 </script>
