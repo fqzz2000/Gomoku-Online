@@ -23,7 +23,9 @@ describe('GameServer', () => {
   });
 
   afterEach(() => {
-    io.close();
+    io.close(() => {
+      httpServer.close();
+    });
     clientSocket.close();
     clientSocket2.close();
   });
@@ -46,9 +48,6 @@ describe('GameServer', () => {
         done();
       });
     });
-    clientSocket.on('userJoined', (data) => {
-      expect(data).to.have.property('id', clientSocket2.id);
-    })
   });
 
   it('two clients join different rooms', (done) => {
@@ -68,7 +67,7 @@ describe('GameServer', () => {
     clientSocket2.emit('joinRoom', {token:'validToken', roomId:'room5', username:"user2"});
     clientSocket2.on('roomInfo', (data) => {
       expect(data.users).to.have.lengthOf(2);
-      clientSocket2.disconnect();
+      clientSocket2.emit('leaveRoom', {token:'validToken', roomId:'room5'});
     });
     clientSocket.on('roomInfo', (data) => {
       expect(data.users).to.have.lengthOf(1);

@@ -1,8 +1,6 @@
 import { Server } from "socket.io";
 import { AuthService } from './AuthService';
 import { Room } from './room';
-import http from 'http';
-import { Socket } from "dgram";
 const port = 8181;
 export class GameServer {
   private io: Server;
@@ -64,12 +62,4 @@ export class GameServer {
 }
 
 
-const server = http.createServer();
-const gameServer = new GameServer(new Server(server, {
-  cors: {
-    origin: "*", 
-    methods: ["GET", "POST"], 
-  }
-}));
-server.listen(port)
-console.log('Server listening on port', port);
+
