@@ -43,16 +43,16 @@ export class GameSocket {
      * Joins a room with the specified ID.
      * @param roomId The ID of the room to join.
      */
-    public joinRoom(roomId: string, username: string): void {
-        this.socket.emit('joinRoom', {token:"placeholder",roomId: roomId, username:username});
+    public joinRoom(roomId: string, userId: string, username: string): void {
+        this.socket.emit('joinRoom', {token:"placeholder",roomId: roomId, userId: userId, username:username});
     }
 
     /**
      * Leaves the room with the specified ID.
      * @param roomId The ID of the room to leave.
      */
-    public leaveRoom(roomId: string): void {
-        this.socket.emit('leaveRoom', {token:"placeholder",roomId: roomId});
+    public leaveRoom(roomId: string, userId : string): void {
+        this.socket.emit('leaveRoom', {token:"placeholder",roomId: roomId, userId : userId});
     }
 
    
@@ -66,15 +66,15 @@ export class GameSocket {
      * @param roomId - The ID of the room where the game is being played.
      * @param pos - The position where the game piece should be placed, specified as an object with `x` and `y` coordinates.
      */
-    public placePiece(roomId: string, pos: {x: number, y: number}): void {
-        this.socket.emit('makeMove', {token:"placeholder",roomId: roomId, pos: pos});
+    public placePiece(roomId: string, x: number, y: number, userId: string): void {
+        this.socket.emit('makeMove', {token:"placeholder",roomId: roomId, x: x, y: y, userId: userId} );
     }
 
     /**
      * Registers a callback function to be called when a new game starts.
      * @param callback The callback function to be called with the position of the piece.
      */
-    public onGameStart(callback: (gameState: any, round: number) => void): void {
+    public onGameStart(callback: (res : {gameState: any, round: number}) => void): void {
         this.socket.on('gameStart', callback);
     }
 
@@ -82,7 +82,8 @@ export class GameSocket {
      * Registers a callback function to be called when a game ends.
      * @param callback The callback function to be called with the winner of the game.
      */
-    public onGameEnd(callback: (gameState : any, winner: number) => void): void {
+    public onGameEnd(callback: (res : {gameState : any, winner: number}) => void): void {
+
         this.socket.on('gameEnd', callback);
     }
 
@@ -90,7 +91,7 @@ export class GameSocket {
      * Registers a callback function to be called when the game state is updated.
      * @param callback The callback function to be called with the updated game state.
      */
-    public onGameState(callback: (gameState: any, round:number) => void): void {
+    public onGameState(callback: (res : {gameState: any, round:number}) => void): void {
         this.socket.on('gameState', callback);
     }
 

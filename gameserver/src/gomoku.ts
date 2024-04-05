@@ -46,8 +46,11 @@ export class Gomoku {
         if (playerId != this.round) {
             return false;
         }
+        if (this.allocPiece(pos, playerId)) {
         this.round = 3 - this.round;
-        return this.allocPiece(pos, playerId);
+        return true;
+      }
+        return false
     }
 
   
@@ -119,6 +122,8 @@ export class Gomoku {
     }
 
     public getBoard(): number[][] {
+        // console.log("getBoard called")
+        // console.log(this.board)
         return this.board;
     }
 

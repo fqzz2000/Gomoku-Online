@@ -71,11 +71,16 @@
   import { ref, computed, onMounted } from 'vue';
   import { io } from 'socket.io-client';
   import { GameSocket } from '../gameSocket';
+  import { useRoute, useRouter } from 'vue-router';
+  const route = useRoute();
+  const userId = route.query.userId;
+  // alert(userId);
 
   const currentPlayer = ref('Alice');
   const timeLeft = ref(13);
   // pieces is a 15 * 15 array initialized with all 0
   const chessboard = ref(Array.from({ length: 15 }, () => Array(15).fill(0)));
+
   let timer = null;
   
   // 初始化棋盘
@@ -89,22 +94,25 @@
     }
     // connect to the server
     gameSocket.connect("your_jwt_token_here");
-    gameSocket.onGameStart((gameState, round) => {
+    gameSocket.onGameStart((res) => {
+
       console.log('Game started');
-        updateGameState(gameState, round);
+        updateGameState(res.board, res.round);
     });
-    gameSocket.onGameState((gameState, round) => {
+    gameSocket.onGameState((res) => {
       console.log('Game state updated');
-        updateGameState(gameState, round);
+        updateGameState(res.board, res.round);
     });
-    gameSocket.onGameEnd((gameState, winner) => {
-        alert(`Game ended. Winner is ${winner}`);
-        updateGameState(gameState, 2);
+    gameSocket.onGameEnd((res) => {
+        alert(`Game ended. Winner is ${res.winner}`);
+        updateGameState(res.board, 2);
     });
 
   });
   
 function updateGameState(board, round) {
+  // alert('Game state updated');
+  console.log(board);
     chessboard.value = board;
     currentPlayer.value = round === 1 ? 'Alice' : 'Bob';
 
@@ -131,7 +139,7 @@ function updateGameState(board, round) {
       if (gridX < 0 || gridX >= 15 || gridY < 0 || gridY >= 15 || chessboard.value[gridY][gridX] !== 0) {
         return;
       }
-        gameSocket.placePiece("roomId1", {gridX, gridY});
+        gameSocket.placePiece("roomId1", gridX, gridY, userId);
     //   chessboard.value[gridY][gridX] = currentPlayer.value === 'Alice' ? 1 : 2;
 
     //   currentPlayer.value = currentPlayer.value === 'Alice' ? 'Bob' : 'Alice';
