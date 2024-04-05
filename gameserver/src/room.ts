@@ -1,3 +1,5 @@
+import { Gomoku } from "./gomoku";
+
 interface User {
     id: string;
     username: string;
@@ -6,9 +8,11 @@ interface User {
 export class Room {
     private users: User[] = [];
     public roomId: string;
+    public game : Gomoku;
   
     constructor(roomId: string) {
       this.roomId = roomId;
+      this.game = new Gomoku();
     }
   
     addUser(user: User): Boolean {
@@ -29,6 +33,10 @@ export class Room {
   
     getUsers(): User[] {
       return this.users;
+    }
+
+    getUserIndex(userId: string): number {
+      return this.users.findIndex(user => user.id === userId);
     }
 
   }

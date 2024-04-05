@@ -8,6 +8,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import App from './App.vue'
 import LobbyPage from './components/LobbyPage.vue'
 import RoomPage from './components/RoomPage.vue'
+import BoardPage from './components/BoardPage.vue'
 
 const routes = [
     {
@@ -17,7 +18,10 @@ const routes = [
     {
         path: '/room',
         component: RoomPage
-
+    }, 
+    {
+        path: '/game',
+        component: BoardPage
     }
 ]
 

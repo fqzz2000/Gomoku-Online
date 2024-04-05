@@ -6,7 +6,7 @@
         <b-col cols="8" class="d-flex flex-column align-items-center justify-content-center bg-primary text-white">
             <b-avatar :src="user1.avatar" size="6rem" class="mb-2"></b-avatar>
             <h2 class="mb-2">{{ user1.name }}</h2>
-        <b-button variant="success" class="w-25 mb-4">Start</b-button>
+        <b-button variant="success" class="w-25 mb-4" @click="startGame">Start</b-button>
             <b-avatar :src="user2.avatar" size="6rem" class="mb-2"></b-avatar>
             <h2 class="mb-2">{{ user2.name }}</h2>
             <b-button variant="danger" class="w-25" @click="leaveRoom">Leave</b-button>
@@ -64,10 +64,9 @@ onMounted(() => {
   gameSocket.connect('your_jwt_token_here');
   gameSocket.onRoomInfo((roomInfo) => {
     alert('Room Info: ' + JSON.stringify(roomInfo));
-    // interface User {
-    // id: string;
-    // username: string;
-    //}
+    gameSocket.onGameStart(() => {
+      router.push('/game');
+    });
   user1.value.name = roomInfo.users[0].username;
   if (roomInfo.users.length > 1) {
     user2.value.name = roomInfo.users[1].username;
@@ -83,6 +82,11 @@ function leaveRoom() {
   gameSocket.leaveRoom("roomId1");
   router.push('/');
   gameSocket.disconnect();
+}
+
+function startGame() {
+  gameSocket.startGame("roomId1");
+
 }
 
 
