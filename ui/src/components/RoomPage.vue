@@ -6,9 +6,10 @@
         <b-col cols="8" class="d-flex flex-column align-items-center justify-content-center bg-primary text-white">
             <b-avatar :src="user1.avatar" size="6rem" class="mb-2"></b-avatar>
             <h2 class="mb-2">{{ user1.name }}</h2>
-        <b-button variant="success" class="w-25 mb-4">Start</b-button>
+        <b-button variant="success" class="w-25 mb-4" @click="startGame">Start</b-button>
             <b-avatar :src="user2.avatar" size="6rem" class="mb-2"></b-avatar>
             <h2 class="mb-2">{{ user2.name }}</h2>
+            <b-button variant="danger" class="w-25" @click="leaveRoom">Leave</b-button>
         </b-col>
   
         <!-- Profile/Chat Section -->
@@ -28,11 +29,17 @@
         </b-col>
       </b-row>
     </b-container>
+
 </template>
 
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import { GameSocket } from '../gameSocket'; 
+import { useRouter } from 'vue-router';
+import { v4 as uuidv4 } from 'uuid';
+
+const router = useRouter();
 
 const user1 = ref({
   avatar: '../assets/images.png',
@@ -47,5 +54,50 @@ const user2 = ref({
   games: 20,
   winRate: 80,
 });
+const userName = "User"+Math.floor(Math.random() * 1000)
+// userid is a uuid
+const userId = uuidv4();
+
+
+
+
+const gameSocket = new GameSocket('http://localhost:8181');
+
+onMounted(() => {
+
+  gameSocket.connect('your_jwt_token_here');
+  gameSocket.onRoomInfo((roomInfo) => {
+    // alert('Room Info: ' + JSON.stringify(roomInfo));
+    gameSocket.onGameStart(() => {
+      router.push({
+        path: '/game',
+        query: {
+          roomId: 'roomId1',
+          userId: userId,
+        },
+      });
+    });
+  user1.value.name = roomInfo.users[0].username;
+  if (roomInfo.users.length > 1) {
+    user2.value.name = roomInfo.users[1].username;
+  } else {
+    user2.value.name = 'Empty';
+  }
+  });
+
+  gameSocket.joinRoom('roomId1', userId, userName);
+});
+
+function leaveRoom() {
+  gameSocket.leaveRoom("roomId1");
+  router.push('/');
+  gameSocket.disconnect();
+}
+
+function startGame() {
+  gameSocket.startGame("roomId1");
+
+}
+
 
 </script>

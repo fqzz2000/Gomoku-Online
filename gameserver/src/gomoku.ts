@@ -2,11 +2,13 @@ export class Gomoku {
     private static boardSize: number = 15;
     private board: number[][];
     private winner: number;
+    private round: number;
   
     constructor() {
       this.board = [];
       this.winner = -1; // -1 represents the game is still going on 0 represents a draw game
       this.newGame();
+      this.round = 1;
     }
   
     /**
@@ -15,6 +17,7 @@ export class Gomoku {
     newGame(): void {
       this.board = Array(Gomoku.boardSize).fill(0).map(() => Array(Gomoku.boardSize).fill(0));
       this.winner = -1;
+      this.round = 1;
     }
   
     /**
@@ -25,13 +28,31 @@ export class Gomoku {
      * @returns A boolean indicating whether the piece was successfully allocated.
      */
     allocPiece(pos: { x: number, y: number }, playerId: number): boolean {
-      if (this.board[pos.x][pos.y] === 0 && this.winner === -1) {
+      if (pos.x < 0 || pos.x >= Gomoku.boardSize || pos.y < 0 || pos.y >= Gomoku.boardSize) {
+        return false;
+      }
+      if (this.board[pos.x][pos.y] !== 0) {
+        return false;
+      }
+      if (this.winner === -1) {
         this.board[pos.x][pos.y] = playerId;
         this.checkWinner(pos, playerId);
         return true;
       }
       return false;
     }
+
+    placePiece(pos: {x : number, y: number}, playerId: number): boolean {
+        if (playerId != this.round) {
+            return false;
+        }
+        if (this.allocPiece(pos, playerId)) {
+        this.round = 3 - this.round;
+        return true;
+      }
+        return false
+    }
+
   
     /**
      * Gets the winner of the Gomoku game.
@@ -101,7 +122,13 @@ export class Gomoku {
     }
 
     public getBoard(): number[][] {
+        // console.log("getBoard called")
+        // console.log(this.board)
         return this.board;
+    }
+
+    public getRound(): number {
+        return this.round;
     }
   }
   

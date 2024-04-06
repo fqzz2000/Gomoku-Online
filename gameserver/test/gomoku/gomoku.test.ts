@@ -1,4 +1,4 @@
-import { Gomoku } from '../../src/gomoku/gomoku'
+import { Gomoku } from '../../src/gomoku'
 import 'mocha';
 import { expect } from 'chai';
 
@@ -9,7 +9,9 @@ describe('Gomoku Game Logic', () => {
   beforeEach(() => {
     game = new Gomoku();
   });
-
+  it ('should start with round 1', () => {
+    expect(game.getRound()).to.equal(1);
+  });
   it('should start with no winner', () => {
     expect(game.getWinner()).to.equal(-1);
   });
@@ -19,8 +21,26 @@ describe('Gomoku Game Logic', () => {
     expect(game.getWinner()).to.equal(-1); // Still no winner
   });
 
+  it ("should prevent same player from playing twice in a row", () => {
+    game.placePiece({ x: 0, y: 0 }, 2);
+    expect(game.placePiece({ x: 1, y: 1 }, 2)).to.be.false;
+  });
+
+  it ("should alternate between players", () => {
+    game.placePiece({ x: 0, y: 0 }, 1);
+    expect(game.placePiece({ x: 1, y: 1 }, 2)).to.be.true;
+    expect(game.getRound()).to.equal(1);
+  });
+
+  it ("should prevent placing a piece out of bounds", () => {
+    expect(game.allocPiece({ x: -1, y: 0 }, 1)).to.be.false;
+    expect(game.allocPiece({ x: 0, y: -1 }, 1)).to.be.false;
+    expect(game.allocPiece({ x: 20, y: 0 }, 1)).to.be.false;
+    expect(game.allocPiece({ x: 0, y: 20 }, 1)).to.be.false;
+  });
+
   it('should prevent placing a piece on an occupied space', () => {
-    game.allocPiece({ x: 0, y: 0 }, 1);
+    game.placePiece({ x: 0, y: 0 }, 1);
     expect(game.allocPiece({ x: 0, y: 0 }, 2)).to.be.false;
   });
 
