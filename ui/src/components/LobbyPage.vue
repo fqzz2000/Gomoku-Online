@@ -59,12 +59,12 @@
       { id: 2, number: 2, player: 'Bob', status: 'playing' },
       { id: 3, number: 3, player: 'Charlie', status: 'waiting' },
     ]);
-    const user = ref({
-      avatar: '../assets/images.png',
-      name: 'Alice',
-      games: 10,
-      winRate: 70,
-    });
+    // const user = ref({
+    //   avatar: '../assets/images.png',
+    //   name: 'Alice',
+    //   games: 10,
+    //   winRate: 70,
+    // });
 
 
     async function fetchUserInfo(username: string) {

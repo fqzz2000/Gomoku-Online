@@ -50,7 +50,7 @@ app.post('/api/register', async (req, res) => {
     total_losses: 0,
     win_rate: 0,
     average_game_time: 0,
-    rank: 'Newbie', // 或者任何你认为合适的默认等级
+    rank: 'Newbie', 
   };
 
   const user = new User({
