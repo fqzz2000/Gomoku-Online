@@ -37,6 +37,20 @@
     import axios from 'axios';
     import { onMounted, ref } from 'vue';
 
+    import { computed } from 'vue';
+    import { useStore } from 'vuex';
+
+    const store = useStore();
+
+    const user = computed(() => store.state.user);
+
+    // 假设你有一个按钮用于登出
+    function logout() {
+      store.dispatch('logout');
+    }
+
+
+
     onMounted(() => {
       fetchUserInfo('user1')
     });
