@@ -11,9 +11,9 @@ import RoomPage from './components/RoomPage.vue'
 import LoginPage from './components/LoginPage.vue'
 import BoardPage from './components/BoardPage.vue'
 import RegisterPage from './components/RegisterPage.vue'
-
-import store from './store'
-
+import store from './store';
+//import store from './store'
+createApp(App).use(store).mount('#app');
 
 const routes = [
     {
@@ -48,16 +48,12 @@ const router = createRouter({
 })
 
 
-createApp(App)
-  .use(store) // 使用store
-  .mount('#app');
-// src/main.js
-import { createApp } from 'vue';
-import App from './App.vue';
-import store from './store'; // 导入store
+
+
+//import store from './store'; // 导入store
 
 createApp(App)
-  .use(store) // 使用store
+ // .use(store) // 使用store
   .mount('#app');
 
 
@@ -65,5 +61,5 @@ createApp(App)
     .use(BootstrapVue)
     .use(BootstrapVueIcons)
     .use(router)
-    .use(store)
+   // .use(store)
     .mount('#app')

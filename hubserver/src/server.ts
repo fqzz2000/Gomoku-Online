@@ -76,13 +76,16 @@ app.post('/api/login', async (req, res) => {
   const user = await User.findOne({ username }).exec();
   if (user && await bcrypt.compare(password, user.password)) {
     // 用户认证成功，生成并返回JWT
-    const token = jwt.sign({ username: username },secretKey, { expiresIn: '1h' });
-    res.json({ token });
+    const token = jwt.sign({ username: username }, secretKey, { expiresIn: '1h' });
+    // 在响应中返回token和用户名
+    console.log('api:',username);
+    res.json({ token, username });
   } else {
     // 用户认证失败
     res.status(401).json({ error: 'Authentication failed' });
   }
 });
+
 mongoose.connect(url).then(() => {
     logger.info('Connected to MongoDB')
     app.listen(port, () => {
