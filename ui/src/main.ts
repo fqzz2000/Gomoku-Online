@@ -8,11 +8,18 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import App from './App.vue'
 import LobbyPage from './components/LobbyPage.vue'
 import RoomPage from './components/RoomPage.vue'
+
+import LoginPage from './components/LoginPage.vue'
 import BoardPage from './components/BoardPage.vue'
+import RegisterPage from './components/RegisterPage.vue'
+import store from './store';
+//import store from './store'
+createApp(App).use(store).mount('#app');
 
 const routes = [
     {
         path: '/',
+        name: 'Lobby',
         component: LobbyPage
     },
     {
@@ -22,7 +29,20 @@ const routes = [
     {
         path: '/game',
         component: BoardPage
-    }
+
+    },
+    {
+        path: '/register',
+        name: 'RegisterPage',
+        component: RegisterPage,
+      },
+    
+      {
+        path: '/login',
+        name: 'Login',
+        component: LoginPage
+      }
+
 ]
 
 const router = createRouter({
@@ -30,8 +50,19 @@ const router = createRouter({
 	routes,
 })
 
+
+
+
+//import store from './store'; // 导入store
+
+createApp(App)
+ // .use(store) // 使用store
+  .mount('#app');
+
+
 createApp(App)
     .use(BootstrapVue)
     .use(BootstrapVueIcons)
     .use(router)
+   // .use(store)
     .mount('#app')
