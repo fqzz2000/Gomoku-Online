@@ -1,11 +1,11 @@
-import express from 'express'
+import express, { Request, Response } from 'express'
 import bodyParser from 'body-parser'
 import pino from 'pino'
 import expressPinoLogger from 'express-pino-logger'
 import mongoose from 'mongoose'
 import { UserController } from './controllers/UserController';
 import jwt from 'jsonwebtoken';
-
+import Room from './models/RoomModel';
 // set up Mongo
 const url = 'mongodb://127.0.0.1:27017'
 
@@ -84,6 +84,52 @@ app.post('/api/login', async (req, res) => {
     // 用户认证失败
     res.status(401).json({ error: 'Authentication failed' });
   }
+});
+
+app.post('/api/rooms', async (req: Request, res: Response) => {
+  const { number, player } = req.body;
+  const newRoom = new Room({ number, player, status: 'waiting' });
+
+try { 
+  const savedRoom = await newRoom.save();
+  res.status(201).json({
+    id: savedRoom._id,
+    number: savedRoom.number,
+    player: savedRoom.player,
+    status: savedRoom.status
+  });
+    } catch (error) {
+    
+      res.status(500).json({ error:"can not save room" });
+    }
+  });
+  app.get('/api/rooms', async (req: Request, res: Response) => {
+    try {
+      const rooms = await Room.find();
+    
+    const modifiedRooms = rooms.map(room => ({
+      id: room._id,
+      number: room.number,
+      player: room.player,
+      status: room.status
+    }));
+    res.json(modifiedRooms);
+    } catch (error) {
+      res.status(500).json({ error:"can not get room info"  });
+    }
+  });
+  app.delete('/api/rooms/:id', async (req: Request, res: Response) => {
+    const roomId = req.params.id;
+    try {
+        const result = await Room.findByIdAndRemove(roomId);
+        if (result) {
+            res.status(204).send(); // 204 No Content
+        } else {
+            res.status(404).json({ error: "Room not found" }); // 404 Not Found if the room doesn't exist
+        }
+    } catch (error) {
+        res.status(500).json({ error: "Server error" }); // 500 Internal Server Error
+    }
 });
 
 mongoose.connect(url).then(() => {

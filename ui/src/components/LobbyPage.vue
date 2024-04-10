@@ -9,9 +9,12 @@
             <!-- Use v-for to list rooms here -->
             <b-list-group-item button v-for="room in rooms" :key="room.id">
               Room {{ room.number }} - Player: {{ room.player }} [{{ room.status }}]
+              <b-button variant="danger" class="float-right" @click.stop="deleteRoom(room.id)">Delete</b-button>
             </b-list-group-item>
           </b-list-group>
         </b-card>
+        <b-button @click="addRoom">Add Room</b-button>
+
       </b-col>
 
       <!-- User Profile/Chat Section -->
@@ -36,21 +39,36 @@
   <script setup lang="ts">
   import axios from 'axios';
   import { onMounted ,ref} from 'vue';
+  import { toRaw } from 'vue';
+
+
+
   // import { useStore } from 'vuex';
   // const store = useStore();
   // const user = computed(() => store.state.user);
 
   onMounted(() => {
   const username = localStorage.getItem('username'); 
+ fetchRooms(); 
+  
   if (username) {
     fetchUserInfo(username);
   }
 });
-  const rooms = ref([
-    { id: 1, number: 1, player: 'Alice', status: 'waiting' },
-    { id: 2, number: 2, player: 'Bob', status: 'playing' },
-    { id: 3, number: 3, player: 'Charlie', status: 'waiting' },
-  ]);
+  // const rooms = ref([
+  //   { id: 1, number: 1, player: 'Alice', status: 'waiting' },
+  //   { id: 2, number: 2, player: 'Bob', status: 'playing' },
+  //   { id: 3, number: 3, player: 'Charlie', status: 'waiting' },
+  // ]);
+  interface Room {
+  id: string;
+  number: string;
+  player: string;
+  status: 'waiting' | 'playing' | 'ready';
+}
+
+const rooms = ref<Room[]>([]);
+
  
   const user = ref({
     avatar: '../assets/images.png',
@@ -82,6 +100,39 @@
       }
     }
   }
+  const fetchRooms = async () => {
+  try {
+
+const response = await axios.get<Room[]>('/api/rooms');
+    rooms.value = response.data;
+    console.log("room info:",toRaw(rooms.value));
+  } catch (error) {
+    
+  
+console.error(error);
+  }
+};
+const addRoom = async () => {
+  try {
+    const maxNumber = rooms.value.reduce((max, room) => Math.max(max, Number(room.number)), 0);
+    const newNumber = maxNumber + 1;
+    const response = await axios.post('/api/rooms', { number: newNumber.toString(), player: user.value.name });
+    rooms.value.push(response.data);
+
+fetchRooms();
+  } catch (error) {
+    console.error(error);
+  }
+};
+const deleteRoom = async (roomId:string) => {
+  try {
+    console.log("Attempting to delete room with ID:", roomId);
+    await axios.delete(`/api/rooms/${roomId}`);
+    fetchRooms(); // 重新获取房间列表以更新UI
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   </script>
 
