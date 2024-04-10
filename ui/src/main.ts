@@ -8,6 +8,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import App from './App.vue'
 import LobbyPage from './components/LobbyPage.vue'
 import RoomPage from './components/RoomPage.vue'
+
 import LoginPage from './components/LoginPage.vue'
 import BoardPage from './components/BoardPage.vue'
 import RegisterPage from './components/RegisterPage.vue'
@@ -28,6 +29,7 @@ const routes = [
     {
         path: '/game',
         component: BoardPage
+
     },
     {
         path: '/register',
@@ -40,6 +42,7 @@ const routes = [
         name: 'Login',
         component: LoginPage
       }
+
 ]
 
 const router = createRouter({
