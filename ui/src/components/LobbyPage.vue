@@ -7,7 +7,7 @@
         <b-card no-body class="mb-1" header="Room List">
           <b-list-group flush>
             <!-- Use v-for to list rooms here -->
-            <b-list-group-item button v-for="room in rooms" :key="room.id">
+            <b-list-group-item button v-for="room in rooms" :key="room.id" @click="enterRoom(room)">
               Room {{ room.number }} - Player: {{ room.player }} [{{ room.status }}]
               <b-button variant="danger" class="float-right" @click.stop="deleteRoom(room.id)">Delete</b-button>
             </b-list-group-item>
@@ -40,9 +40,9 @@
   import axios from 'axios';
   import { onMounted ,ref} from 'vue';
   import { toRaw } from 'vue';
+  import { useRouter } from 'vue-router';
 
-
-
+  const router = useRouter();
   // import { useStore } from 'vuex';
   // const store = useStore();
   // const user = computed(() => store.state.user);
@@ -129,6 +129,14 @@ const deleteRoom = async (roomId:string) => {
     console.log("Attempting to delete room with ID:", roomId);
     await axios.delete(`/api/rooms/${roomId}`);
     fetchRooms(); // 重新获取房间列表以更新UI
+  } catch (error) {
+    console.error(error);
+  }
+};
+const enterRoom = async (room: Room) => {
+  try {
+    // Navigate to the RoomPage with the roomId as a parameter
+    await router.push({ name: 'Room', params: { roomId: room.id } });
   } catch (error) {
     console.error(error);
   }

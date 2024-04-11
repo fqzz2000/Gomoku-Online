@@ -37,10 +37,20 @@
 import { onMounted, ref } from 'vue';
 import { GameSocket } from '../gameSocket'; 
 import { useRouter } from 'vue-router';
+import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-
+import { useRoute } from 'vue-router';
+interface Room {
+  id: string;
+  number: string;
+  player: string;
+  status: 'waiting' | 'playing' | 'ready';
+}
+const route = useRoute();
 const router = useRouter();
-
+const roomId = route.params.roomId as string;
+const roomInfoLocal = ref<Room | null>(null);
+const userName = ref<string| null>(null);
 const user1 = ref({
   avatar: '../assets/images.png',
   name: 'Alice',
@@ -54,17 +64,29 @@ const user2 = ref({
   games: 20,
   winRate: 80,
 });
-const userName = "User"+Math.floor(Math.random() * 1000)
+//const userName = "User"+Math.floor(Math.random() * 1000)
 // userid is a uuid
-const userId = uuidv4();
+//const userId = uuidv4();
 
 
 
 
 const gameSocket = new GameSocket('http://localhost:8181');
 
-onMounted(() => {
+onMounted(async () => {
+  try {
+    const response = await axios.get(`/api/rooms/${roomId}`);
+    roomInfoLocal.value = response.data;
+    if (roomInfoLocal.value) {
+      userName.value = roomInfoLocal.value.player;
+}
+  
 
+  } catch (error) {
+    console.error("Failed to fetch room info:", error);
+   
+  } 
+   
   gameSocket.connect('your_jwt_token_here');
   gameSocket.onRoomInfo((roomInfo) => {
     // alert('Room Info: ' + JSON.stringify(roomInfo));
@@ -72,8 +94,8 @@ onMounted(() => {
       router.push({
         path: '/game',
         query: {
-          roomId: 'roomId1',
-          userId: userId,
+          roomId: roomId,
+          userId: userName.value,
         },
       });
     });
@@ -84,8 +106,8 @@ onMounted(() => {
     user2.value.name = 'Empty';
   }
   });
-
-  gameSocket.joinRoom('roomId1', userId, userName);
+if (userName.value !== null) 
+  gameSocket.joinRoom(roomId, userName.value, userName.value);
 });
 
 function leaveRoom() {

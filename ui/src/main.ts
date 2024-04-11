@@ -23,8 +23,9 @@ const routes = [
         component: LobbyPage
     },
     {
-        path: '/room',
-        component: RoomPage
+        path: '/room/:roomId',
+        name: 'Room',
+        component: () => import('./components/RoomPage.vue')
     }, 
     {
         path: '/game',
