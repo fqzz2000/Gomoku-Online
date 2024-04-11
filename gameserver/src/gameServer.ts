@@ -40,7 +40,19 @@ export class GameServer {
     
     this.io.on('connection', (socket) => {
       console.log('Client connected:', socket.id);
-
+      socket.on("getGameState", (req) => {
+        const { token, roomId } = req;
+        if (!this.authService.verifyToken(token)) {
+          socket.emit('error', 'Authentication failed');
+          return;
+        }
+        const room = this.rooms.get(roomId);
+        if (room === undefined) {
+          socket.emit('error', 'Room not found');
+          return;
+        }
+        socket.emit('gameState', { board: room.game.getBoard(), round: room.game.getRound() });
+      });
       socket.on('joinRoom', (req) => {
         const { token, roomId, userId, username } = req;
         if (!this.authService.verifyToken(token)) {
@@ -60,13 +72,22 @@ export class GameServer {
           return;
         }
         const user = { id: userId, username: username }; // Get username from decoded token
+        socket.join(roomId);
+        // makesure the user is not already in the room
+        if (room.getUserIndex(userId) !== -1) {
+          console.log("duplicate user", user , "in room", roomId)
+          console.log("current users in room", room.getUsers())
+          
+          this.io.to(roomId).emit('roomInfo', { roomId: roomId, users: room.getUsers() });
+          return;
+        }
         console.log("add user", user , "to room", roomId)
         if (!room.addUser(user)) {
           socket.emit('error', 'Room is full');
           return;
         }
 
-        socket.join(roomId);
+
         // socket.emit('roomInfo', { roomId, users: room.getUsers() });
         this.io.to(roomId).emit('roomInfo', { roomId: roomId, users: room.getUsers() });
       });
@@ -131,7 +152,7 @@ export class GameServer {
           return;
         }
         if (room.game.getWinner() !== -1) {
-          socket.emit('error', 'Game is over');
+          this.io.to(roomId).emit('gameEnd', { board:room.game.getBoard(), winner: room.game.getWinner() });
           return;
         }
         if (room.game.getRound() !== userIndex + 1) {

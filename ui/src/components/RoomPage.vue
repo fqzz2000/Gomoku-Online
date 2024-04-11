@@ -37,8 +37,9 @@
 import { onMounted, ref } from 'vue';
 import { GameSocket } from '../gameSocket'; 
 import { useRouter } from 'vue-router';
-import axios from 'axios';
+import { Data } from "../data"
 
+import axios from 'axios';
 
 import { useRoute } from 'vue-router';
 interface Room {
@@ -83,27 +84,41 @@ onMounted(async () => {
 
    
   gameSocket.connect('your_jwt_token_here');
-  gameSocket.onRoomInfo((roomInfo) => {
+  gameSocket.onRoomInfo(async (roomInfo) => {
     // alert('Room Info: ' + JSON.stringify(roomInfo));
-    gameSocket.onGameStart(() => {
+
+  user1.value.name = roomInfo.users[0].username;
+  let ret = await Data.fetchUserProfile(roomInfo.users[0].username);
+  user1.value.games = ret.totalGame;
+  user1.value.winRate = ret.winRate;
+  user1.value.avatar = ret.avatar;
+  if (roomInfo.users.length > 1) {
+    user2.value.name = roomInfo.users[1].username;
+    let ret = await Data.fetchUserProfile(roomInfo.users[1].username);
+    user2.value.games = ret.totalGame;
+    user2.value.winRate = ret.winRate;
+    user2.value.avatar = ret.avatar;
+  } else {
+    user2.value.name = 'Empty';
+  }
+  });
+  gameSocket.onGameStart(() => {
       router.push({
         path: '/game',
         query: {
           roomId: roomId,
           userId: userName.value,
-          user1: user1.value.name,
-          user2: user2.value.name,
-
+          user1name: user1.value.name,
+          user2name: user2.value.name,
+          user1avatar: user1.value.avatar,
+          user2avatar: user2.value.avatar,
+          user1games: user1.value.games,
+          user2games: user2.value.games,
+          user1winRate: user1.value.winRate,
+          user2winRate: user2.value.winRate,
         },
       });
     });
-  user1.value.name = roomInfo.users[0].username;
-  if (roomInfo.users.length > 1) {
-    user2.value.name = roomInfo.users[1].username;
-  } else {
-    user2.value.name = 'Empty';
-  }
-  });
 if (userName.value !== null) 
   gameSocket.joinRoom(roomId, userName.value, userName.value);
 });
@@ -118,6 +133,9 @@ function startGame() {
   gameSocket.startGame(roomId);
 
 }
+
+
+
 
 
 </script>
