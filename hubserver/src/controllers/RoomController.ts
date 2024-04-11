@@ -59,3 +59,33 @@ export const getRooms = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Server error" }); // 500 Internal Server Error
     }
 };
+
+import { RoomService } from '../services/RoomService';
+export class RoomController {
+    private roomService: RoomService;
+
+    constructor() {
+        this.roomService = new RoomService();
+    }
+
+    public async updateRoomInfo(req, res) {
+        try {
+            const { roomId, roomState } = req.body;
+            if (!roomId || !roomState) {
+                return res.status(400).json({ message: "Missing 'roomId' or 'roomState'." });
+            }
+
+            const updatedRoom = await this.roomService.updateRoomInfo(roomId, roomState);
+            return res.status(200).json({
+                message: "Room information updated successfully.",
+                data: updatedRoom,
+            });
+        } catch (error) {
+            if (error.message === 'Room not found') {
+                return res.status(404).json({ message: error.message });
+            }
+            console.error(error);
+            return res.status(500).json({ message: "An error occurred on the server." });
+        }
+    }
+}
