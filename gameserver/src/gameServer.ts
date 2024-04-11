@@ -76,6 +76,7 @@ export class GameServer {
         // makesure the user is not already in the room
         if (room.getUserIndex(userId) !== -1) {
           console.log("duplicate user", user , "in room", roomId)
+          console.log("current users in room", room.getUsers())
           
           this.io.to(roomId).emit('roomInfo', { roomId: roomId, users: room.getUsers() });
           return;
