@@ -1,6 +1,7 @@
 import Room from '../models/RoomModel';
 import { Request, Response } from 'express';
 import { RoomService } from '../services/RoomService';
+
 export const createRoom = async (req: Request, res: Response) => {
     const { number, player } = req.body;
     const newRoom = new Room({ number, player, status: 'waiting' });
@@ -91,3 +92,4 @@ export class RoomController {
         }
     }
 }
+

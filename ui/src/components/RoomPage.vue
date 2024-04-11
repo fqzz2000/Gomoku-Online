@@ -52,6 +52,7 @@ const roomId = route.params.roomId as string;
 const username = route.query.username as string;
 
 const userName = ref<string>(username);
+
 const user1 = ref({
   avatar: '../assets/images.png',
   name: 'Alice',
@@ -76,6 +77,7 @@ const gameSocket = new GameSocket('http://localhost:8181');
 
 onMounted(async () => {
   userName.value = username;
+
    
   gameSocket.connect('your_jwt_token_here');
   gameSocket.onRoomInfo((roomInfo) => {
@@ -88,6 +90,7 @@ onMounted(async () => {
           userId: userName.value,
           user1: user1.value.name,
           user2: user2.value.name,
+
         },
       });
     });

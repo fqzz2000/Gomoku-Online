@@ -50,6 +50,7 @@
   onMounted(() => {
   const username = localStorage.getItem('username'); 
   fetchRooms(); 
+
   
   if (username) {
     fetchUserInfo(username);
@@ -139,6 +140,7 @@ const enterRoom = async (room: Room) => {
     console.log("Entering room:", room);
     console.log("user name:", user.value.name);
     await router.push({ name: 'Room', params: { roomId: room.id}, query: { username: user.value.name}});
+
   } catch (error) {
     console.error(error);
   }

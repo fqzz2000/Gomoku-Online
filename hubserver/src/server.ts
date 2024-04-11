@@ -7,6 +7,7 @@ import { UserController,registerUser, loginUser } from './controllers/UserContro
 import jwt from 'jsonwebtoken';
 import Room from './models/RoomModel';
 import {createRoom,deleteRoomById,getRoomById,getRooms, RoomController } from './controllers/RoomController';
+
 // set up Mongo
 const url = 'mongodb://127.0.0.1:27017'
 
@@ -27,6 +28,7 @@ app.get("/", (req, res) => {
     res.send("Hello World")
 })
 app.get('/api/users/:username', (req, res) => (userController.getUserProfile(req, res)));
+
 
 
 
