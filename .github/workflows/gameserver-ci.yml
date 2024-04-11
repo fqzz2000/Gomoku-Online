@@ -22,4 +22,9 @@ jobs:
         cd gameserver
         npm ci
         npm test
+    - name: Run tests in hubserver
+      run: |
+        cd hubserver
+        npm ci
+        npm test
 

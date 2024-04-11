@@ -49,7 +49,8 @@
 
   onMounted(() => {
   const username = localStorage.getItem('username'); 
- fetchRooms(); 
+  fetchRooms(); 
+
   
   if (username) {
     fetchUserInfo(username);
@@ -136,7 +137,10 @@ const deleteRoom = async (roomId:string) => {
 const enterRoom = async (room: Room) => {
   try {
     // Navigate to the RoomPage with the roomId as a parameter
-    await router.push({ name: 'Room', params: { roomId: room.id } });
+    console.log("Entering room:", room);
+    console.log("user name:", user.value.name);
+    await router.push({ name: 'Room', params: { roomId: room.id}, query: { username: user.value.name}});
+
   } catch (error) {
     console.error(error);
   }

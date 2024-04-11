@@ -67,6 +67,31 @@ export class UserController {
     this.userService = new UserService();
   }
 
+  public async updateGameResult(req: Request, res: Response): Promise<void> {
+    console.log("received request to update Game Result")
+    const { gameResult  } = req.body;
+    const player1 = gameResult.player1;
+    const player2 = gameResult.player2;
+    const winner = gameResult.winner;
+    if (!player1 || !player2 || !winner) {
+      res.status(400).json({ message: "Missing 'player1', 'player2', or 'winner'." });
+      return;
+    }
+    console.log("player1: ", player1, " player2: ", player2, " winner: ", winner)
+    try {
+      await this.userService.incrementUserGameStats(player1, winner === 1, winner === 0);
+      await this.userService.incrementUserGameStats(player2, winner === 2, winner === 0);
+      res.status(200).json({ message: 'Game result updated successfully' });
+    } catch (error) {
+      console.error('Error updating game result:', error);
+      if (error instanceof Error) {
+        res.status(500).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'An unknown error occurred' });
+      }
+    }
+  }
+
   public async getUserProfile(req: Request, res: Response): Promise<void> {
     try {
       console.log('Request received');
