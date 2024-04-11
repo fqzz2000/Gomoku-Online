@@ -49,6 +49,7 @@
 
   onMounted(() => {
   const username = localStorage.getItem('username'); 
+
  fetchRooms(); 
   
   if (username) {
@@ -80,7 +81,11 @@ const rooms = ref<Room[]>([]);
 
   async function fetchUserInfo(username: string) {
     try {
-      const response = await axios.get(`/api/users/${username}`);
+      const response = await axios.get(`/api/users/${username}`,{
+  headers: {
+    'Authorization': `Bearer ${localStorage.getItem('token')}`
+  }
+});
       user.value.name = response.data.username;
       console.log('user.value.name',user.value.name);
       console.log('User info:', response.data);
@@ -103,7 +108,11 @@ const rooms = ref<Room[]>([]);
   const fetchRooms = async () => {
   try {
 
-const response = await axios.get<Room[]>('/api/rooms');
+const response = await axios.get<Room[]>('/api/rooms',{
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem('token')}`
+  }
+});
     rooms.value = response.data;
     console.log("room info:",toRaw(rooms.value));
   } catch (error) {
@@ -116,7 +125,9 @@ const addRoom = async () => {
   try {
     const maxNumber = rooms.value.reduce((max, room) => Math.max(max, Number(room.number)), 0);
     const newNumber = maxNumber + 1;
-    const response = await axios.post('/api/rooms', { number: newNumber.toString(), player: user.value.name });
+    const response = await axios.post('/api/rooms', { number: newNumber.toString(), player: user.value.name,  headers: {
+    Authorization: `Bearer ${localStorage.getItem('token')}`
+  } });
     rooms.value.push(response.data);
 
 fetchRooms();
@@ -127,7 +138,10 @@ fetchRooms();
 const deleteRoom = async (roomId:string) => {
   try {
     console.log("Attempting to delete room with ID:", roomId);
-    await axios.delete(`/api/rooms/${roomId}`);
+    await axios.delete(`/api/rooms/${roomId}`,{
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem('token')}`
+  }});
     fetchRooms(); // 重新获取房间列表以更新UI
   } catch (error) {
     console.error(error);

@@ -8,7 +8,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/UserModel';
 
 
-const secretKey = process.env.SECRET_KEY || '9b1d8eead0f1b2c3d4e5f6901a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t';
+
 
 export const registerUser = async (req: Request, res: Response) => {
   const { username, password, email } = req.body;
@@ -39,6 +39,7 @@ export const registerUser = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error registering new user' });
   }
 };
+const secretKey = process.env.SECRET_KEY || '9b1d8eead0f1b2c3d4e5f6901a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t';
 
 export const loginUser = async (req: Request, res: Response) => {
   const { username, password } = req.body;

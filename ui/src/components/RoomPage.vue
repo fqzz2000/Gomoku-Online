@@ -38,7 +38,7 @@ import { onMounted, ref } from 'vue';
 import { GameSocket } from '../gameSocket'; 
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
+//import { v4 as uuidv4 } from 'uuid';
 import { useRoute } from 'vue-router';
 interface Room {
   id: string;
@@ -75,7 +75,10 @@ const gameSocket = new GameSocket('http://localhost:8181');
 
 onMounted(async () => {
   try {
-    const response = await axios.get(`/api/rooms/${roomId}`);
+    const response = await axios.get(`/api/rooms/${roomId}`,{
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem('token')}`
+  }});
     roomInfoLocal.value = response.data;
     if (roomInfoLocal.value) {
       userName.value = roomInfoLocal.value.player;
