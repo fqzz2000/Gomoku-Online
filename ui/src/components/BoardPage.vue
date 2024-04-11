@@ -52,15 +52,16 @@
               <b-button @click="resetTimer">Reset Timer</b-button>
             </b-card>
             <b-card-group deck>
-              <b-card header="Alice" align="center">
-                <p>Win Rate: 96%</p>
-                <p>Total Games: 100</p>
+              <b-card :header="user1.name" align="center">
+                <p>Win Rate: {{ user1.winRate }}</p>
+                <p>Total Games: {{ user1.games }}</p>
               </b-card>
-              <b-card header="Bob" align="center">
-                <p>Win Rate: 33%</p>
-                <p>Total Games: 23</p>
+              <b-card :header="user2.name" align="center">
+                <p>Win Rate: {{ user2.winRate }}</p>
+                <p>Total Games: {{ user2.games}} </p>
               </b-card>
             </b-card-group>
+            <b-button v-if="gameEnded" @click="leaveRoom">Leave Room</b-button>
           </b-col>
         </b-row>
       </b-container>
@@ -71,19 +72,31 @@
   import { ref, computed, onMounted } from 'vue';
   import { io } from 'socket.io-client';
   import { GameSocket } from '../gameSocket';
-  import { useRoute, useRouter } from 'vue-router';
+  import { routerKey, useRoute, useRouter } from 'vue-router';
+  import { Data } from '../data';
+  const router = useRouter();
   const route = useRoute();
   const roomId = route.query.roomId;
   const userId = route.query.userId;
-  const user1Name = route.query.user1;
-  const user2Name = route.query.user2;
+  const  user1 = ref({
+    name: route.query.user1name,
+    avatar : route.query.user1avatar,
+    games : route.query.user1games,
+    winRate : route.query.user1winRate
+  })
+const user2 = ref({
+    name: route.query.user2name,
+    avatar : route.query.user2avatar,
+    games : route.query.user2games,
+    winRate : route.query.user2winRate
+})
   // alert(userId);
 
   const currentPlayer = ref('Alice');
   const timeLeft = ref(13);
   // pieces is a 15 * 15 array initialized with all 0
   const chessboard = ref(Array.from({ length: 15 }, () => Array(15).fill(0)));
-
+  const gameEnded = ref(false);
   let timer = null;
   
   // 初始化棋盘
@@ -107,10 +120,13 @@
         updateGameState(res.board, res.round);
     });
     gameSocket.onGameEnd((res) => {
-      let winner = res.winner === 1 ? user1Name : user2Name;
+      let winner = res.winner === 1 ? user1.value.name : user2.value.name;
         alert(`Game ended. Winner is ${winner}`);
         updateGameState(res.board, 2);
+        gameEnded.value = true;
     });
+    gameSocket.getGameState(roomId);
+
 
   });
   
@@ -118,8 +134,12 @@ function updateGameState(board, round) {
   // alert('Game state updated');
   console.log(board);
     chessboard.value = board;
-    currentPlayer.value = round === 1 ? user1Name : user2Name;
+    currentPlayer.value = round === 1 ? user1.value.name : user2.value.name;
 
+}
+
+function leaveRoom() {
+  router.push('/');
 }
 
   // 计时器函数
