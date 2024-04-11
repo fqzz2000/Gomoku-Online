@@ -73,7 +73,10 @@
   import { GameSocket } from '../gameSocket';
   import { useRoute, useRouter } from 'vue-router';
   const route = useRoute();
+  const roomId = route.query.roomId;
   const userId = route.query.userId;
+  const user1Name = route.query.user1;
+  const user2Name = route.query.user2;
   // alert(userId);
 
   const currentPlayer = ref('Alice');
@@ -104,7 +107,8 @@
         updateGameState(res.board, res.round);
     });
     gameSocket.onGameEnd((res) => {
-        alert(`Game ended. Winner is ${res.winner}`);
+      let winner = res.winner === 1 ? user1Name : user2Name;
+        alert(`Game ended. Winner is ${winner}`);
         updateGameState(res.board, 2);
     });
 
@@ -114,7 +118,7 @@ function updateGameState(board, round) {
   // alert('Game state updated');
   console.log(board);
     chessboard.value = board;
-    currentPlayer.value = round === 1 ? 'Alice' : 'Bob';
+    currentPlayer.value = round === 1 ? user1Name : user2Name;
 
 }
 
@@ -139,7 +143,7 @@ function updateGameState(board, round) {
       if (gridX < 0 || gridX >= 15 || gridY < 0 || gridY >= 15 || chessboard.value[gridY][gridX] !== 0) {
         return;
       }
-        gameSocket.placePiece("roomId1", gridX, gridY, userId);
+        gameSocket.placePiece(roomId, gridX, gridY, userId);
     //   chessboard.value[gridY][gridX] = currentPlayer.value === 'Alice' ? 1 : 2;
 
     //   currentPlayer.value = currentPlayer.value === 'Alice' ? 'Bob' : 'Alice';

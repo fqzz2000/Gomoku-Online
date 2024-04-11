@@ -50,8 +50,8 @@
   onMounted(() => {
   const username = localStorage.getItem('username'); 
 
- fetchRooms(); 
-  
+  fetchRooms(); 
+
   if (username) {
     fetchUserInfo(username);
   }
@@ -113,6 +113,7 @@ const response = await axios.get<Room[]>('/api/rooms',{
     Authorization: `Bearer ${localStorage.getItem('token')}`
   }
 });
+
     rooms.value = response.data;
     console.log("room info:",toRaw(rooms.value));
   } catch (error) {
@@ -128,6 +129,7 @@ const addRoom = async () => {
     const response = await axios.post('/api/rooms', { number: newNumber.toString(), player: user.value.name,  headers: {
     Authorization: `Bearer ${localStorage.getItem('token')}`
   } });
+
     rooms.value.push(response.data);
 
 fetchRooms();
@@ -142,6 +144,7 @@ const deleteRoom = async (roomId:string) => {
   headers: {
     Authorization: `Bearer ${localStorage.getItem('token')}`
   }});
+
     fetchRooms(); // 重新获取房间列表以更新UI
   } catch (error) {
     console.error(error);
@@ -150,7 +153,10 @@ const deleteRoom = async (roomId:string) => {
 const enterRoom = async (room: Room) => {
   try {
     // Navigate to the RoomPage with the roomId as a parameter
-    await router.push({ name: 'Room', params: { roomId: room.id } });
+    console.log("Entering room:", room);
+    console.log("user name:", user.value.name);
+    await router.push({ name: 'Room', params: { roomId: room.id}, query: { username: user.value.name}});
+
   } catch (error) {
     console.error(error);
   }

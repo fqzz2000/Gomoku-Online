@@ -1,4 +1,6 @@
+
 import express, { Request, Response,NextFunction } from 'express'
+
 import bodyParser from 'body-parser'
 import pino from 'pino'
 import expressPinoLogger from 'express-pino-logger'
@@ -6,7 +8,9 @@ import mongoose from 'mongoose'
 import { UserController,registerUser, loginUser } from './controllers/UserController';
 import jwt from 'jsonwebtoken';
 import Room from './models/RoomModel';
-import {createRoom,deleteRoomById,getRoomById,getRooms } from './controllers/roomController';
+
+import {createRoom,deleteRoomById,getRoomById,getRooms, RoomController } from './controllers/RoomController';
+
 // set up Mongo
 
 import bcrypt from 'bcrypt';
@@ -17,7 +21,11 @@ const url = 'mongodb://127.0.0.1:27017'
 const app = express()
 const port = parseInt(process.env.PORT as string) || 8131
 const userController = new UserController()
+
 //onst token = localStorage.getItem('token');
+
+const roomController = new RoomController()
+
 app.use(bodyParser.json())
 
 
@@ -83,6 +91,17 @@ app.post('/api/rooms',authenticateJWT, createRoom);
   app.get('/api/rooms',authenticateJWT, getRooms);
   app.delete('/api/rooms/:id', authenticateJWT,deleteRoomById);
 app.get('/api/rooms/:roomId',authenticateJWT, getRoomById);
+
+
+
+app.post("/api/UpdateGameResult", async (req: Request, res: Response) => {
+  // to be implemented
+  userController.updateGameResult(req, res);
+})
+
+app.post("/api/UpdateRoomState", async (req: Request, res: Response) => {
+  roomController.updateRoomInfo(req, res);
+})
 mongoose.connect(url).then(() => {
     logger.info('Connected to MongoDB')
     app.listen(port, () => {
