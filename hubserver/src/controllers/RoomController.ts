@@ -1,5 +1,6 @@
 import Room from '../models/RoomModel';
 import { Request, Response } from 'express';
+
 import { RoomService } from '../services/RoomService';
 
 export const createRoom = async (req: Request, res: Response) => {
@@ -60,6 +61,7 @@ export const getRooms = async (req: Request, res: Response) => {
         console.error("Error deleting room:", error);
         res.status(500).json({ error: "Server error" }); // 500 Internal Server Error
     }
+
 };
 
 export class RoomController {

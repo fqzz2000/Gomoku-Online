@@ -38,6 +38,9 @@ import { onMounted, ref } from 'vue';
 import { GameSocket } from '../gameSocket'; 
 import { useRouter } from 'vue-router';
 import { Data } from "../data"
+
+import axios from 'axios';
+
 import { useRoute } from 'vue-router';
 interface Room {
   id: string;
@@ -48,6 +51,7 @@ interface Room {
 const route = useRoute();
 const router = useRouter();
 const roomId = route.params.roomId as string;
+
 const username = route.query.username as string;
 
 const userName = ref<string>(username);
@@ -75,6 +79,7 @@ const user2 = ref({
 const gameSocket = new GameSocket('http://localhost:8181');
 
 onMounted(async () => {
+
   userName.value = username;
 
    
