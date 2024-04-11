@@ -1,5 +1,6 @@
 import Room from '../models/RoomModel';
 import { Request, Response } from 'express';
+import { RoomService } from '../services/RoomService';
 export const createRoom = async (req: Request, res: Response) => {
     const { number, player } = req.body;
     const newRoom = new Room({ number, player, status: 'waiting' });
@@ -60,8 +61,6 @@ export const getRooms = async (req: Request, res: Response) => {
     }
 };
 
-import { RoomService } from '../services/RoomService';
-import { Request, Response } from 'express';
 export class RoomController {
     private roomService: RoomService;
 
