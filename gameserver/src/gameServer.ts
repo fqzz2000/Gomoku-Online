@@ -2,11 +2,38 @@ import { Server } from "socket.io";
 import { AuthService } from './AuthService';
 import { Room } from './room';
 import { Gomoku } from "./gomoku";
+import axios from 'axios';
+
 const port = 8181;
+
+
+
 export class GameServer {
   private io: Server;
   private authService: AuthService = new AuthService();
   private rooms: Map<string, Room> = new Map();
+
+  private static changeRoomState(roomId: string, roomState: string) {
+    axios.post('http://localhost:8131/api/UpdateRoomState', { roomId: roomId, roomState: roomState})
+      .then((res) => {
+        console.log(`statusCode: ${res.status}`);
+        console.log(res.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  private static updateGameResult(user1 : string, user2 : string, winner : number) {
+    axios.post('http://localhost:8131/api/UpdateGameResult', { gameResult:{ winner : winner, player1 : user1, player2 : user2}})
+      .then((res) => {
+        console.log(`statusCode: ${res.status}`);
+        console.log(res.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 
   constructor(io: Server) {
     this.io = io;
@@ -79,6 +106,8 @@ export class GameServer {
         }
         // start the game
         room.game.newGame();
+        // inform the hub server
+        GameServer.changeRoomState(roomId, 'playing');
         // send the game state to the users
         this.io.to(roomId).emit('gameStart', { board: room.game.getBoard(), round: room.game.getRound() });
       });
@@ -115,7 +144,11 @@ export class GameServer {
         }
         this.io.to(roomId).emit('gameState', { board: room.game.getBoard(), round: room.game.getRound() });
         if (room.game.getWinner() !== -1) {
-          this.io.to(roomId).emit('gameEnd', { board:room.game.getBoard, winner: room.game.getWinner() });
+          this.io.to(roomId).emit('gameEnd', { board:room.game.getBoard(), winner: room.game.getWinner() });
+          // inform the hub server
+          GameServer.changeRoomState(roomId, 'ended');
+          // update the game result
+          GameServer.updateGameResult(room.getUsers()[0].username, room.getUsers()[1].username, room.game.getWinner());
         }
       });
 

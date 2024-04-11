@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IRoom extends Document {
   number: string;
   player: string;
-  status: 'waiting' | 'playing' | 'ended';
+  status: 'waiting' | 'playing' | 'ended' | "ready";
 }
 
 const roomSchema: Schema = new Schema({
@@ -11,7 +11,7 @@ const roomSchema: Schema = new Schema({
   player: { type: String, required: true },
   status: {
     type: String,
-    enum: ['waiting', 'playing', 'ended'],
+    enum: ['waiting', 'playing', 'ended', 'ready'],
     default: 'waiting'
   }
 });

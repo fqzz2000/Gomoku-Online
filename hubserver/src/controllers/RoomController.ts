@@ -61,6 +61,7 @@ export const getRooms = async (req: Request, res: Response) => {
 };
 
 import { RoomService } from '../services/RoomService';
+import { Request, Response } from 'express';
 export class RoomController {
     private roomService: RoomService;
 
@@ -68,19 +69,21 @@ export class RoomController {
         this.roomService = new RoomService();
     }
 
-    public async updateRoomInfo(req, res) {
+    public async updateRoomInfo(req : Request, res : Response) {
         try {
             const { roomId, roomState } = req.body;
+            console.log("received request to update room info to: ", roomState, " for room: ", roomId);
             if (!roomId || !roomState) {
                 return res.status(400).json({ message: "Missing 'roomId' or 'roomState'." });
             }
 
             const updatedRoom = await this.roomService.updateRoomInfo(roomId, roomState);
+            
             return res.status(200).json({
                 message: "Room information updated successfully.",
                 data: updatedRoom,
             });
-        } catch (error) {
+        } catch (error : any) {
             if (error.message === 'Room not found') {
                 return res.status(404).json({ message: error.message });
             }

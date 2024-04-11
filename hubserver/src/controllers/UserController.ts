@@ -68,6 +68,7 @@ export class UserController {
   }
 
   public async updateGameResult(req: Request, res: Response): Promise<void> {
+    console.log("received request to update Game Result")
     const { gameResult  } = req.body;
     const player1 = gameResult.player1;
     const player2 = gameResult.player2;
@@ -76,6 +77,7 @@ export class UserController {
       res.status(400).json({ message: "Missing 'player1', 'player2', or 'winner'." });
       return;
     }
+    console.log("player1: ", player1, " player2: ", player2, " winner: ", winner)
     try {
       await this.userService.incrementUserGameStats(player1, winner === 1, winner === 0);
       await this.userService.incrementUserGameStats(player2, winner === 2, winner === 0);
