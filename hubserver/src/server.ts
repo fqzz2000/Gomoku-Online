@@ -126,7 +126,8 @@ app.post("/api/UpdateRoomState", async (req: Request, res: Response) => {
 app.post('/api/rooms/:roomId/players/add', addPlayerToRoom);
 
 
-app.post('/api/rooms/:roomId/players/remove', removePlayerFromRoom);
+app.post('/api/rooms/players/remove', removePlayerFromRoom);
+
 
 // static files
 app.use('/public', express.static('public'));

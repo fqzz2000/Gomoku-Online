@@ -15,6 +15,17 @@ export class GameServer {
   private authService: AuthService = new AuthService();
   private rooms: Map<string, Room> = new Map();
 
+  private static removePlayerFromRoom(roomId: string, playerName: string) {
+    axios.post(`http://localhost:8131/api/rooms/players/remove`, { roomId:roomId,playerName: playerName })
+    .then((res) => {
+      console.log(`statusCode: ${res.status}`);
+      // console.log(res.data);
+    }
+    ).catch((error) => {
+      console.error("error removing player from room:", error.message);
+    });
+  }
+
   private static changeRoomState(roomId: string, roomState: string) {
     axios.post('http://localhost:8131/api/UpdateRoomState', { roomId: roomId, roomState: roomState})
       .then((res) => {
@@ -109,6 +120,7 @@ export class GameServer {
       
       socket.on("leaveRoom", async (req) => {
         const { token, roomId, userId } = req;
+        console.log('User left room:', roomId);
         let usrname = await this.authService.verifyToken(token);
         if (usrname === false) {
           socket.emit('error', 'Authentication failed');
@@ -123,6 +135,7 @@ export class GameServer {
         socket.leave(roomId);
         room.removeUser(usrname);
         this.io.to(roomId).emit('roomInfo', { roomId: roomId, users: room.getUsers() });
+        GameServer.removePlayerFromRoom(roomId, usrname);
       } );
 
       socket.on("startGame", async (req) => {
