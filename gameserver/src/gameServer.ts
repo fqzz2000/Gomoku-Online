@@ -166,6 +166,7 @@ export class GameServer {
           return;
         }
         this.io.to(roomId).emit('gameState', { board: room.game.getBoard(), round: room.game.getRound() });
+        console.log('Game state broadcasted');
         if (room.game.getWinner() !== -1) {
           this.io.to(roomId).emit('gameEnd', { board:room.game.getBoard(), winner: room.game.getWinner() });
           // inform the hub server

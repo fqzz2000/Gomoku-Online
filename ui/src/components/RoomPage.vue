@@ -91,13 +91,13 @@ onMounted(async () => {
     // alert('Room Info: ' + JSON.stringify(roomInfo));
 
   user1.value.name = roomInfo.users[0].username;
-  let ret = await Data.fetchUserProfile(roomInfo.users[0].username);
+  let ret = await Data.fetchUserProfile(roomInfo.users[0].username, localStorage.getItem('token') as string);
   user1.value.games = ret.totalGame;
   user1.value.winRate = ret.winRate;
   user1.value.avatar = ret.avatar;
   if (roomInfo.users.length > 1) {
     user2.value.name = roomInfo.users[1].username;
-    let ret = await Data.fetchUserProfile(roomInfo.users[1].username);
+    let ret = await Data.fetchUserProfile(roomInfo.users[1].username, localStorage.getItem('token') as string);
     user2.value.games = ret.totalGame;
     user2.value.winRate = ret.winRate;
     user2.value.avatar = ret.avatar;

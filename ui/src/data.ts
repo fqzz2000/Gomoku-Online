@@ -1,15 +1,16 @@
 import axios from 'axios';
 import { User } from './common';
+import { getWithToken } from './utils';
 
 export class Data {
-    public static async fetchUserProfile(username: string): Promise<User> {
+    public static async fetchUserProfile(username: string, token:string): Promise<User> {
             let ret : User = {id : "",
                 username : "",
                 avatar : "",
                 totalGame : 0 ,
                 winRate : 0};
             try {
-              const response = await axios.get(`/api/users/${username}`);
+              const response = await getWithToken(`/api/users/${username}`,token);
                 ret.username = response.data.username;
               ret.totalGame = response.data.game_stats.total_games_played;
               if (response.data.total_games_played > 0) {
