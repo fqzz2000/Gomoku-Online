@@ -44,21 +44,15 @@
   import { getWithToken, postWithToken, deleteWithToken } from '../utils';
 
   const router = useRouter();
-  // import { useStore } from 'vuex';
-  // const store = useStore();
-  // const user = computed(() => store.state.user);
+
 
   onMounted(() => {
   //const username = localStorage.getItem('username'); 
   //const username=req.user.username;
-  fetchRooms(); 
+  fetchRooms();
   fetchUserInfo(); 
-});
-  // const rooms = ref([
-  //   { id: 1, number: 1, player: 'Alice', status: 'waiting' },
-  //   { id: 2, number: 2, player: 'Bob', status: 'playing' },
-  //   { id: 3, number: 3, player: 'Charlie', status: 'waiting' },
-  // ]);
+  });
+
   interface Room {
   id: string;
   number: string;
@@ -77,35 +71,22 @@ const rooms = ref<Room[]>([]);
   });
 
 
-  async function fetchUserInfo(username: string) {
+  async function fetchUserInfo() {
     try {
+      const username = "xsasa";
       const response = await getWithToken(`/api/users/${username}`, localStorage.getItem('token') as string);
-      user.value.name = response.data.username;
-      console.log('user.value.name',user.value.name);
-      console.log('User info:', response.data);
-      user.value.games = response.data.game_stats.total_games_played;
-      console.log(' user.value.games', user.value.games);
-      if (response.data.total_games_played > 0) {
-      user.value.winRate = (response.data.game_stats.total_wins / response.data.game_stats.total_games_played) * 100;
-    } else {
-      console.log('else', user.value.games);
-      user.value.winRate = 0; 
-    }
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error(error.message);
-      } else {
-        console.error("Failed to fetch user info:", error);
-      }
-    });
-   
-    user.value = {
+      user.value = {
       avatar: response.data.avatar || '../assets/images.png', 
       name: response.data.username, 
       games: response.data.game_stats.total_games_played,
-      winRate: (response.data.game_stats.total_wins / response.data.game_stats.total_games_played) * 100
-    };
-    console.log('User info fetched:', response.data);
+      winRate: response.data.game_stats.total_games_played === 0 ? 0 : (response.data.game_stats.total_wins / response.data.game_stats.total_games_played) * 100
+      }
+      console.log('User info fetched:', response.data);
+    
+    
+   
+  
+
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error('Failed to fetch user info:', error.response?.data.error);
