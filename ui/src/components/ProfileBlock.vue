@@ -18,6 +18,7 @@
         ref="fileInput"
         @change="handleFileChange"
       />
+
       <b-card-text>
         <h5>{{ user.name }}</h5>
         <p>Games Played: {{ user.games }}</p>
@@ -26,6 +27,7 @@
       </b-card-text>
       <b-button v-if="enableEdit" variant="primary" @click="toEdit">Edit Profile</b-button>
 
+
     </b-card>
   </template>
 <script setup lang="ts">
@@ -33,6 +35,7 @@
     import { useRouter } from 'vue-router';
     const router = useRouter();
     const emit = defineEmits(['avatar-updated']);
+
     const props = defineProps<{
         user: {
             avatar: string;
@@ -87,5 +90,6 @@ async function toEdit() {
   console.log("toEdit");
   await router.push({name : "Profile"});
 }
+
 
 </script>

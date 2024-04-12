@@ -20,7 +20,10 @@
       <!-- User Profile/Chat Section -->
       <b-col md="4">
         <ProfileBlock :user="user" :enable-edit="true" :enable-upload="false"/>
+<<<<<<< HEAD
         <b-button variant="danger" @click="logout">Logout</b-button>
+=======
+>>>>>>> 2b23bd8 (abstractout profile block)
 
         <b-card no-body header="More Profile or A chat room">
           <!-- Chat or profile content here -->
@@ -72,7 +75,8 @@ const rooms = ref<Room[]>([]);
 
   async function fetchUserInfo() {
     try {
-     const username = "xsasa";
+
+      const username = "xsasa";
       
       console.log('User info is fetching');
       const response = await getWithToken(`/api/users/${username}`, localStorage.getItem('token') as string);
