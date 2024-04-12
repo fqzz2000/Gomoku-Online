@@ -42,6 +42,7 @@ const authenticateJWT = (req: Request, res: Response, next:NextFunction) => {
 
     jwt.verify(token, secretKey, (err, user) => {
       if (err) {
+        console.error("Error verifying JWT:", err);
         return res.sendStatus(403);
       }
 
@@ -49,6 +50,7 @@ const authenticateJWT = (req: Request, res: Response, next:NextFunction) => {
       next();
     });
   } else {
+    console.log("No token")
     res.sendStatus(401);
   }
 };
