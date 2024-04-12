@@ -9,7 +9,7 @@ import { UserController,registerUser, loginUser } from './controllers/UserContro
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import Room from './models/RoomModel';
 
-import {createRoom,deleteRoomById,getRoomById,getRooms, RoomController } from './controllers/RoomController';
+import {createRoom,deleteRoomById,getRoomById,getRooms, RoomController,addPlayerToRoom ,removePlayerFromRoom} from './controllers/RoomController';
 
 // set up Mongo
 
@@ -48,6 +48,7 @@ const authenticateJWT = (req: Request, res: Response, next:NextFunction) => {
 
     jwt.verify(token, secretKey, (err, decoded) => {
       if (err) {
+
         console.error("Error verifying JWT:", err);
         return res.sendStatus(403);
 
@@ -62,6 +63,7 @@ const authenticateJWT = (req: Request, res: Response, next:NextFunction) => {
       }
     });
   } else {
+
     console.log("No token")
     res.sendStatus(401);
 
@@ -121,9 +123,13 @@ app.post("/api/UpdateRoomState", async (req: Request, res: Response) => {
   roomController.updateRoomInfo(req, res);
 })
 
+app.post('/api/rooms/:roomId/players/add', addPlayerToRoom);
+
+
+app.post('/api/rooms/:roomId/players/remove', removePlayerFromRoom);
+
 // static files
 app.use('/public', express.static('public'));
-
 
 mongoose.connect(url).then(() => {
     logger.info('Connected to MongoDB')

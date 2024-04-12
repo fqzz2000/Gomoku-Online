@@ -4,15 +4,19 @@ import { Request, Response } from 'express';
 import { RoomService } from '../services/RoomService';
 
 export const createRoom = async (req: Request, res: Response) => {
-    const { number, player } = req.body;
-    const newRoom = new Room({ number, player, status: 'waiting' });
+    const { number, players } = req.body;
+    const newRoom = new Room({
+      number,
+      players: players, 
+      status: 'waiting'
+    });
   
     try {
       const savedRoom = await newRoom.save();
       res.status(201).json({
         id: savedRoom._id,
         number: savedRoom.number,
-        player: savedRoom.player,
+        players: savedRoom.players,
         status: savedRoom.status
       });
     } catch (error) {
@@ -40,7 +44,7 @@ export const getRooms = async (req: Request, res: Response) => {
       const modifiedRooms = rooms.map(room => ({
         id: room._id,
         number: room.number,
-        player: room.player,
+        players: room.players,
         status: room.status
       }));
       res.json(modifiedRooms);
@@ -95,3 +99,35 @@ export class RoomController {
     }
 }
 
+
+const roomService = new RoomService();
+
+export const addPlayerToRoom = async (req: Request, res: Response) => {
+    const { roomId, playerName } = req.body;
+    try {
+        const room = await roomService.addPlayerToRoom(roomId, playerName);
+        if (room) {
+            res.status(200).json(room);
+        } else {
+            res.status(404).json({ message: "Room not found" });
+        }
+    } catch (error) {
+        console.error("Error in controller adding player to room:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+export const removePlayerFromRoom = async (req: Request, res: Response) => {
+    const { roomId, playerName } = req.body;
+    try {
+        const room = await roomService.removePlayerFromRoom(roomId, playerName);
+        if (room) {
+            res.status(200).json(room);
+        } else {
+            res.status(404).json({ message: "Room not found" });
+        }
+    } catch (error) {
+        console.error("Error in controller removing player from room:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};

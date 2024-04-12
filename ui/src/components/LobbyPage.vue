@@ -8,7 +8,7 @@
           <b-list-group flush>
             <!-- Use v-for to list rooms here -->
             <b-list-group-item button v-for="room in rooms" :key="room.id" @click="enterRoom(room)">
-              Room {{ room.number }} - Player: {{ room.player }} [{{ room.status }}]
+              Room {{ room.number }} - Player: {{ room.players.join(', ') }}  [{{ room.status }}]
               <b-button variant="danger" class="float-right" @click.stop="deleteRoom(room.id)">Delete</b-button>
             </b-list-group-item>
           </b-list-group>
@@ -46,6 +46,7 @@
   const router = useRouter();
 
 
+
   onMounted(() => {
   //const username = localStorage.getItem('username'); 
   //const username=req.user.username;
@@ -56,7 +57,7 @@
   interface Room {
   id: string;
   number: string;
-  player: string;
+  players: string[];
   status: 'waiting' | 'playing' | 'ready';
 }
 
@@ -71,10 +72,12 @@ const rooms = ref<Room[]>([]);
   });
 
 
+
   async function fetchUserInfo() {
     try {
       const username = "xsasa";
       const response = await getWithToken(`/api/users/${username}`, localStorage.getItem('token') as string);
+
       user.value = {
       avatar: response.data.avatar || '../assets/images.png', 
       name: response.data.username, 
@@ -86,9 +89,7 @@ const rooms = ref<Room[]>([]);
       console.log('User info fetched:', response.data);
     
     
-   
   
-
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error('Failed to fetch user info:', error.response?.data.error);
@@ -115,7 +116,13 @@ const addRoom = async () => {
     console.log("Adding a new room, token:", localStorage.getItem('token'));
     const maxNumber = rooms.value.reduce((max, room) => Math.max(max, Number(room.number)), 0);
     const newNumber = maxNumber + 1;
-    const response = await postWithToken('/api/rooms', { number: newNumber.toString(), player: user.value.name}, localStorage.getItem('token') as string);
+    const response = await axios.post('/api/rooms', {
+      number: newNumber.toString(),
+      players: [user.value.name],
+      status: 'waiting'  // Make sure new rooms are set to 'waiting'
+    }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
     // const response = await axios.post('/api/rooms', { number: newNumber.toString(), player: user.value.name},  {headers: {
   //   Authorization: `Bearer ${localStorage.getItem('token')}`
   // }});
@@ -143,17 +150,36 @@ const deleteRoom = async (roomId:string) => {
 const enterRoom = async (room: Room) => {
   try {
     if (room.status === 'waiting') {
-      console.log("Entering room:", room);
-      console.log("user name:", user.value.name);
-      await router.push({ name: 'Room', params: { roomId: room.id}, query: { username: user.value.name}});
+   
+      const response = await axios.post('/api/rooms/:roomId/players/add', {
+        roomId: room.id,
+        playerName: user.value.name
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+
+      if (response.status === 200) {
+        console.log("User added to room:", response.data);
+        await router.push({ name: 'Room', params: { roomId: room.id }, query: { username: user.value.name }});
+      } else {
+        console.error('Failed to join room:', response.data);
+        alert('Failed to join room.');
+      }
     } else {
       console.log(`Cannot enter room ${room.number}: Room is not in waiting status.`);
-      // Optionally alert the user
       alert(`Cannot enter room ${room.number}: Room is currently ${room.status}.`);
     }
-  } catch (error) {
-    console.error(error);
+  } catch (error: unknown) {
+  if (error instanceof Error) {
+    console.error('Error entering room:', error);
+    alert(`Error entering room: ${error.message}`);
+  } else {
+   
+    console.error('Error entering room:', error);
+    alert('Error entering room: An unknown error occurred.');
+
   }
+}
 };
 
 
