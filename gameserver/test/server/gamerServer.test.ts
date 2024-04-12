@@ -31,7 +31,7 @@ describe('GameServer', () => {
   });
 
   it('should join a room', (done) => {
-    clientSocket.emit('joinRoom', {token:'validToken', roomId:'room1', username:"user1"});
+    clientSocket.emit('joinRoom', {token:'validToken', roomId:'room1', username:"user1", userId: "user1"});
     clientSocket.on('roomInfo', (data) => {
       expect(data).to.have.property('roomId', 'room1');
       done();
@@ -39,8 +39,8 @@ describe('GameServer', () => {
   });
 
   it('two clients should join the same room', (done) => {
-    clientSocket.emit('joinRoom', {token:'validToken', roomId:'room2', username:"user1"});
-    clientSocket2.emit('joinRoom', {token:'validToken', roomId:'room2', username:"user2"});
+    clientSocket.emit('joinRoom', {token:'validToken', roomId:'room2', username:"user1", userId: "user1"});
+    clientSocket2.emit('joinRoom', {token:'validToken', roomId:'room2', username:"user2", userId: "user2"});
     clientSocket.on('roomInfo', (data) => {
       expect(data).to.have.property('roomId', 'room2');
       clientSocket2.on('roomInfo', (data) => {
@@ -51,8 +51,8 @@ describe('GameServer', () => {
   });
 
   it('two clients join different rooms', (done) => {
-    clientSocket.emit('joinRoom', {token:'validToken', roomId:'room3', username:"user1"});
-    clientSocket2.emit('joinRoom', {token:'validToken', roomId:'room4', username:"user2"});
+    clientSocket.emit('joinRoom', {token:'validToken', roomId:'room3', username:"user1", userId: "user1"});
+    clientSocket2.emit('joinRoom', {token:'validToken', roomId:'room4', username:"user2", userId: "user2"});
     clientSocket.on('roomInfo', (data) => {
       expect(data).to.have.property('roomId', 'room3');
       clientSocket2.on('roomInfo', (data) => {
@@ -63,8 +63,8 @@ describe('GameServer', () => {
   });
 
   it ('should emit roomInfo event when a user disconnects', (done) => {
-    clientSocket.emit('joinRoom', {token:'validToken', roomId:'room5', username:"user1"});
-    clientSocket2.emit('joinRoom', {token:'validToken', roomId:'room5', username:"user2"});
+    clientSocket.emit('joinRoom', {token:'validToken', roomId:'room5', username:"user1", userId: "user1"});
+    clientSocket2.emit('joinRoom', {token:'validToken', roomId:'room5', username:"user2",   userId: "user2"});
     clientSocket2.on('roomInfo', (data) => {
       expect(data.users).to.have.lengthOf(2);
       clientSocket2.emit('leaveRoom', {token:'validToken', roomId:'room5'});

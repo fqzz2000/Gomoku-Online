@@ -41,6 +41,7 @@
   import { onMounted ,ref} from 'vue';
   import { toRaw } from 'vue';
   import { useRouter } from 'vue-router';
+  import { getWithToken, postWithToken, deleteWithToken } from '../utils';
 
   const router = useRouter();
   // import { useStore } from 'vuex';
@@ -76,11 +77,25 @@ const rooms = ref<Room[]>([]);
   });
 
 
-  async function fetchUserInfo() {
-  try {
-    const response = await axios.get('/api/users/:username', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+  async function fetchUserInfo(username: string) {
+    try {
+      const response = await getWithToken(`/api/users/${username}`, localStorage.getItem('token') as string);
+      user.value.name = response.data.username;
+      console.log('user.value.name',user.value.name);
+      console.log('User info:', response.data);
+      user.value.games = response.data.game_stats.total_games_played;
+      console.log(' user.value.games', user.value.games);
+      if (response.data.total_games_played > 0) {
+      user.value.winRate = (response.data.game_stats.total_wins / response.data.game_stats.total_games_played) * 100;
+    } else {
+      console.log('else', user.value.games);
+      user.value.winRate = 0; 
+    }
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error(error.message);
+      } else {
+        console.error("Failed to fetch user info:", error);
       }
     });
    
@@ -102,11 +117,7 @@ const rooms = ref<Room[]>([]);
   const fetchRooms = async () => {
   try {
 
-const response = await axios.get<Room[]>('/api/rooms',{
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem('token')}`
-  }
-});
+const response = await getWithToken('/api/rooms', localStorage.getItem('token') as string);
 
     rooms.value = response.data;
     console.log("room info:",toRaw(rooms.value));
@@ -118,19 +129,21 @@ console.error(error);
 };
 const addRoom = async () => {
   try {
+    console.log("Adding a new room, token:", localStorage.getItem('token'));
     const maxNumber = rooms.value.reduce((max, room) => Math.max(max, Number(room.number)), 0);
     const newNumber = maxNumber + 1;
-    const response = await axios.post('/api/rooms', {
-      number: newNumber.toString(),
-      player: user.value.name,
-      status: 'waiting'  // Make sure new rooms are set to 'waiting'
-    }, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
 
-    const newRoom = response.data;
+
+    const response = await postWithToken('/api/rooms', { number: newNumber.toString(), player: user.value.name}, localStorage.getItem('token') as string);
+    // const response = await axios.post('/api/rooms', { number: newNumber.toString(), player: user.value.name},  {headers: {
+  //   Authorization: `Bearer ${localStorage.getItem('token')}`
+  // }});
+
+        const newRoom = response.data;
     rooms.value.push(newRoom);
     enterRoom(newRoom);  // Redirect to the new room immediately
+
+fetchRooms();
   } catch (error) {
     console.error(error);
   }
@@ -139,10 +152,7 @@ const addRoom = async () => {
 const deleteRoom = async (roomId:string) => {
   try {
     console.log("Attempting to delete room with ID:", roomId);
-    await axios.delete(`/api/rooms/${roomId}`,{
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem('token')}`
-  }});
+    await deleteWithToken(`/api/rooms/${roomId}`, localStorage.getItem('token') as string);
 
     fetchRooms(); // 重新获取房间列表以更新UI
   } catch (error) {

@@ -41,13 +41,17 @@ const logger = pino({
 })
 const authenticateJWT = (req: Request, res: Response, next:NextFunction) => {
   const authHeader = req.headers.authorization;
-
+  // print out the entire request object
+  console.log("Request object: ", req.headers);
   if (authHeader) {
     const token = authHeader.split(' ')[1];
 
     jwt.verify(token, secretKey, (err, decoded) => {
       if (err) {
-        return res.sendStatus(403); // Forbidden
+
+        console.error("Error verifying JWT:", err);
+        return res.sendStatus(403);
+
       }
 
       if (typeof decoded === 'object' && decoded !== null && 'username' in decoded) {
@@ -59,7 +63,10 @@ const authenticateJWT = (req: Request, res: Response, next:NextFunction) => {
       }
     });
   } else {
-    res.sendStatus(401); // Unauthorized
+
+    console.log("No token")
+    res.sendStatus(401);
+
   }
 };
 

@@ -60,6 +60,10 @@ export class GameSocket {
         this.socket.emit('startGame', {token:"placeholder",roomId: roomId});
     }
 
+    public getGameState(roomId: string): void {
+        this.socket.emit('getGameState', {token:"placeholder",roomId: roomId});
+    }
+
     /**
      * Places a game piece on the board.
      * 
