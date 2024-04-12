@@ -39,15 +39,26 @@ export class GameServer {
 
   constructor(io: Server) {
     this.io = io;
+    // this.io.use((socket, next) => {
+    //   const token = socket.handshake.query.token as string;
+    //   // console.log('Authenticating Token:', token);
+    //   if (!this.authService.verifyToken(token)) {
+    //     return next(new Error('Authentication failed'));
+    //   }
+    //   console.log('Authentication successful Token:', token);
+    //   next();
+    // })
     
     this.io.on('connection', (socket) => {
       console.log('Client connected:', socket.id);
-      socket.on("getGameState", (req) => {
+      socket.on("getGameState", async (req) => {
         const { token, roomId } = req;
-        if (!this.authService.verifyToken(token)) {
+        let username = await this.authService.verifyToken(token);
+        if (username === false) {
           socket.emit('error', 'Authentication failed');
           return;
         }
+        console.log('User requested game state:', roomId);
         const room = this.rooms.get(roomId);
         if (room === undefined) {
           socket.emit('error', 'Room not found');
@@ -56,9 +67,10 @@ export class GameServer {
         socket.join(roomId);
         socket.emit('gameState', { board: room.game.getBoard(), round: room.game.getRound() });
       });
-      socket.on('joinRoom', (req) => {
+      socket.on('joinRoom', async (req) => {
         const { token, roomId, userId, username } = req;
-        if (!this.authService.verifyToken(token)) {
+        let usrname = await this.authService.verifyToken(token);
+        if (usrname === false) {
           socket.emit('error', 'Authentication failed');
           return;
         }
@@ -74,10 +86,10 @@ export class GameServer {
           socket.emit('error', 'Room not found');
           return;
         }
-        const user = { id: userId, username: username }; // Get username from decoded token
+        const user = { id: usrname, username: usrname }; // Get username from decoded token
         socket.join(roomId);
         // makesure the user is not already in the room
-        if (room.getUserIndex(userId) !== -1) {
+        if (room.getUserIndex(usrname) !== -1) {
           console.log("duplicate user", user , "in room", roomId)
           console.log("current users in room", room.getUsers())
           
@@ -95,9 +107,10 @@ export class GameServer {
         this.io.to(roomId).emit('roomInfo', { roomId: roomId, users: room.getUsers() });
       });
       
-      socket.on("leaveRoom", (req) => {
+      socket.on("leaveRoom", async (req) => {
         const { token, roomId, userId } = req;
-        if (!this.authService.verifyToken(token)) {
+        let usrname = await this.authService.verifyToken(token);
+        if (usrname === false) {
           socket.emit('error', 'Authentication failed');
           return;
         }
@@ -108,13 +121,14 @@ export class GameServer {
           return;
         }
         socket.leave(roomId);
-        room.removeUser(userId);
+        room.removeUser(usrname);
         this.io.to(roomId).emit('roomInfo', { roomId: roomId, users: room.getUsers() });
       } );
 
-      socket.on("startGame", (req) => {
+      socket.on("startGame", async (req) => {
         const { token, roomId } = req;
-        if (!this.authService.verifyToken(token)) {
+        let usr = await this.authService.verifyToken(token);
+        if (usr === false) {
           socket.emit('error', 'Authentication failed');
           return;
         }
@@ -136,20 +150,21 @@ export class GameServer {
         this.io.to(roomId).emit('gameStart', { board: room.game.getBoard(), round: room.game.getRound() });
       });
 
-      socket.on("makeMove", (req) => {
+      socket.on("makeMove", async (req) => {
         const { token, roomId, x, y, userId } = req;
-        if (!this.authService.verifyToken(token)) {
+        let usrname = await this.authService.verifyToken(token);
+        if (usrname === false) {
           socket.emit('error', 'Authentication failed');
           return;
         }
-        console.log('User made a move:', x, y, userId);
+        console.log('User made a move:', x, y, usrname);
         socket.join(roomId);
         const room = this.rooms.get(roomId);
         if (room === undefined) {
           socket.emit('error', 'Room not found');
           return;
         }
-        let userIndex = room.getUserIndex(userId);
+        let userIndex = room.getUserIndex(usrname);
         if (userIndex === -1) {
           socket.emit('error', 'User not found');
           return;

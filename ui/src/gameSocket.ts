@@ -6,14 +6,20 @@ import { io, Socket } from 'socket.io-client';
 export class GameSocket {
     private socket: Socket;
     private serverUrl: string;
+    private token: string;
 
     /**
      * Creates an instance of GameSocket.
      * @param serverUrl The URL of the server to connect to.
      */
-    constructor(serverUrl: string) {
+    constructor(serverUrl: string, token: string) {
         this.serverUrl = serverUrl;
-        this.socket = io(this.serverUrl);
+        this.socket = io(this.serverUrl, {
+            query: {
+                token: token
+            }
+        });
+        this.token = token;
     }
 
     /**
@@ -44,7 +50,7 @@ export class GameSocket {
      * @param roomId The ID of the room to join.
      */
     public joinRoom(roomId: string, userId: string, username: string): void {
-        this.socket.emit('joinRoom', {token:"placeholder",roomId: roomId, userId: userId, username:username});
+        this.socket.emit('joinRoom', {token:this.token,roomId: roomId, userId: userId, username:username});
     }
 
     /**
@@ -52,16 +58,16 @@ export class GameSocket {
      * @param roomId The ID of the room to leave.
      */
     public leaveRoom(roomId: string, userId : string): void {
-        this.socket.emit('leaveRoom', {token:"placeholder",roomId: roomId, userId : userId});
+        this.socket.emit('leaveRoom', {token:this.token,roomId: roomId, userId : userId});
     }
 
    
     public startGame(roomId: string): void {
-        this.socket.emit('startGame', {token:"placeholder",roomId: roomId});
+        this.socket.emit('startGame', {token:this.token,roomId: roomId});
     }
 
     public getGameState(roomId: string): void {
-        this.socket.emit('getGameState', {token:"placeholder",roomId: roomId});
+        this.socket.emit('getGameState', {token:this.token,roomId: roomId});
     }
 
     /**
@@ -71,7 +77,7 @@ export class GameSocket {
      * @param pos - The position where the game piece should be placed, specified as an object with `x` and `y` coordinates.
      */
     public placePiece(roomId: string, x: number, y: number, userId: string): void {
-        this.socket.emit('makeMove', {token:"placeholder",roomId: roomId, x: x, y: y, userId: userId} );
+        this.socket.emit('makeMove', {token:this.token,roomId: roomId, x: x, y: y, userId: userId} );
     }
 
     /**

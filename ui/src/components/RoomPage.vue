@@ -79,14 +79,14 @@ const user2 = ref({
 
 
 
-const gameSocket = new GameSocket('http://localhost:8181');
+const gameSocket = new GameSocket('http://localhost:8181', localStorage.getItem('token') as string);
 
 onMounted(async () => {
 
   userName.value = username;
 
    
-  gameSocket.connect('your_jwt_token_here');
+  gameSocket.connect(localStorage.getItem('token') as string);
   gameSocket.onRoomInfo(async (roomInfo) => {
     // alert('Room Info: ' + JSON.stringify(roomInfo));
 
