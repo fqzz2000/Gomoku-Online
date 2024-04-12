@@ -80,6 +80,7 @@ const rooms = ref<Room[]>([]);
       name: response.data.username, 
       games: response.data.game_stats.total_games_played,
       winRate: response.data.game_stats.total_games_played === 0 ? 0 : (response.data.game_stats.total_wins / response.data.game_stats.total_games_played) * 100
+
       }
       console.log('User info fetched:', response.data);
     
