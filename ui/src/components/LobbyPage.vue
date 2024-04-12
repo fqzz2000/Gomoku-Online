@@ -114,8 +114,6 @@ const addRoom = async () => {
     console.log("Adding a new room, token:", localStorage.getItem('token'));
     const maxNumber = rooms.value.reduce((max, room) => Math.max(max, Number(room.number)), 0);
     const newNumber = maxNumber + 1;
-
-
     const response = await postWithToken('/api/rooms', { number: newNumber.toString(), player: user.value.name}, localStorage.getItem('token') as string);
     // const response = await axios.post('/api/rooms', { number: newNumber.toString(), player: user.value.name},  {headers: {
   //   Authorization: `Bearer ${localStorage.getItem('token')}`
