@@ -134,7 +134,7 @@ app.use('/public', express.static('public'));
 
 mongoose.connect(url).then(() => {
     logger.info('Connected to MongoDB')
-    app.listen(port, () => {
+    app.listen(port,'0.0.0.0', ()=> {
         logger.info(`Server running on port ${port}`)
     })})
 
