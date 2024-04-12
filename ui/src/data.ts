@@ -11,6 +11,7 @@ export class Data {
                 winRate : 0};
             try {
               const response = await getWithToken(`/api/users/${username}`,token);
+              ret.avatar = response.data.avatar;
                 ret.username = response.data.username;
               ret.totalGame = response.data.game_stats.total_games_played;
               if (response.data.game_stats.total_games_played > 0) {
