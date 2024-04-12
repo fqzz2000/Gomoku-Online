@@ -1,8 +1,10 @@
 import { Server } from "socket.io";
+import express, { Request, Response, NextFunction } from 'express';
 import { AuthService } from './AuthService';
 import { Room } from './room';
 import { Gomoku } from "./gomoku";
 import axios from 'axios';
+
 
 const port = 8181;
 
