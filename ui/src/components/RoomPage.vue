@@ -42,7 +42,7 @@ import { useRouter } from 'vue-router';
 import { Data } from "../data"
 
 
-import axios from 'axios';
+//import axios from 'axios';
 
 import { useRoute } from 'vue-router';
 // interface Room {

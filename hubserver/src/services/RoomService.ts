@@ -37,6 +37,12 @@ export class RoomService {
                 { $pull: { players: playerName } },
                 { new: true, session: null } // 使用 session 为 null，除非您需要事务处理
             );
+
+            if (room && room.players.length === 0) {
+               
+                await Room.findByIdAndRemove(roomId);
+                return null;
+            }
             return room;
         }  catch (error: unknown) {
             if (error instanceof Error) {
