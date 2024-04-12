@@ -6,7 +6,7 @@ import pino from 'pino'
 import expressPinoLogger from 'express-pino-logger'
 import mongoose from 'mongoose'
 import { UserController,registerUser, loginUser } from './controllers/UserController';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import Room from './models/RoomModel';
 
 import {createRoom,deleteRoomById,getRoomById,getRooms, RoomController } from './controllers/RoomController';
@@ -14,7 +14,8 @@ import {createRoom,deleteRoomById,getRoomById,getRooms, RoomController } from '.
 // set up Mongo
 
 import bcrypt from 'bcrypt';
-import User from './models/UserModel';
+
+import User, { IUser } from './models/UserModel';
 const url = 'mongodb://127.0.0.1:27017'
 
 // set up Express
@@ -27,7 +28,11 @@ const userController = new UserController()
 const roomController = new RoomController()
 
 app.use(bodyParser.json())
-
+declare module 'express-serve-static-core' {
+  interface Request {
+    user: IUser; 
+  }
+}
 
 const logger = pino({
   transport: {
@@ -41,18 +46,27 @@ const authenticateJWT = (req: Request, res: Response, next:NextFunction) => {
   if (authHeader) {
     const token = authHeader.split(' ')[1];
 
-    jwt.verify(token, secretKey, (err, user) => {
+    jwt.verify(token, secretKey, (err, decoded) => {
       if (err) {
+
         console.error("Error verifying JWT:", err);
         return res.sendStatus(403);
+
       }
 
-      //req.user = user;
-      next();
+      if (typeof decoded === 'object' && decoded !== null && 'username' in decoded) {
+        // Assuming that decoded object is of type IUser or has at least a 'username' property.
+        req.user = decoded as IUser;
+        next();
+      } else {
+        return res.sendStatus(401); // Unauthorized
+      }
     });
   } else {
+
     console.log("No token")
     res.sendStatus(401);
+
   }
 };
 

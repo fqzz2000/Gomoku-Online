@@ -37,17 +37,20 @@
 import { onMounted, ref } from 'vue';
 import { GameSocket } from '../gameSocket'; 
 import { useRouter } from 'vue-router';
+// import axios from 'axios';
+
 import { Data } from "../data"
+
 
 import axios from 'axios';
 
 import { useRoute } from 'vue-router';
-interface Room {
-  id: string;
-  number: string;
-  player: string;
-  status: 'waiting' | 'playing' | 'ready';
-}
+// interface Room {
+//   id: string;
+//   number: string;
+//   player: string;
+//   status: 'waiting' | 'playing' | 'ready';
+// }
 const route = useRoute();
 const router = useRouter();
 const roomId = route.params.roomId as string;

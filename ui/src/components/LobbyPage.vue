@@ -49,13 +49,10 @@
   // const user = computed(() => store.state.user);
 
   onMounted(() => {
-  const username = localStorage.getItem('username'); 
-
+  //const username = localStorage.getItem('username'); 
+  //const username=req.user.username;
   fetchRooms(); 
-
-  if (username) {
-    fetchUserInfo(username);
-  }
+  fetchUserInfo(); 
 });
   // const rooms = ref([
   //   { id: 1, number: 1, player: 'Alice', status: 'waiting' },
@@ -79,6 +76,7 @@ const rooms = ref<Room[]>([]);
     winRate: 70,
   });
 
+
   async function fetchUserInfo(username: string) {
     try {
       const response = await getWithToken(`/api/users/${username}`, localStorage.getItem('token') as string);
@@ -99,8 +97,23 @@ const rooms = ref<Room[]>([]);
       } else {
         console.error("Failed to fetch user info:", error);
       }
+    });
+   
+    user.value = {
+      avatar: response.data.avatar || '../assets/images.png', 
+      name: response.data.username, 
+      games: response.data.game_stats.total_games_played,
+      winRate: (response.data.game_stats.total_wins / response.data.game_stats.total_games_played) * 100
+    };
+    console.log('User info fetched:', response.data);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Failed to fetch user info:', error.response?.data.error);
+    } else {
+      console.error('An unexpected error occurred:', error);
     }
   }
+}
   const fetchRooms = async () => {
   try {
 
@@ -119,18 +132,23 @@ const addRoom = async () => {
     console.log("Adding a new room, token:", localStorage.getItem('token'));
     const maxNumber = rooms.value.reduce((max, room) => Math.max(max, Number(room.number)), 0);
     const newNumber = maxNumber + 1;
+
+
     const response = await postWithToken('/api/rooms', { number: newNumber.toString(), player: user.value.name}, localStorage.getItem('token') as string);
     // const response = await axios.post('/api/rooms', { number: newNumber.toString(), player: user.value.name},  {headers: {
   //   Authorization: `Bearer ${localStorage.getItem('token')}`
   // }});
 
-    rooms.value.push(response.data);
+        const newRoom = response.data;
+    rooms.value.push(newRoom);
+    enterRoom(newRoom);  // Redirect to the new room immediately
 
 fetchRooms();
   } catch (error) {
     console.error(error);
   }
 };
+
 const deleteRoom = async (roomId:string) => {
   try {
     console.log("Attempting to delete room with ID:", roomId);
@@ -143,15 +161,20 @@ const deleteRoom = async (roomId:string) => {
 };
 const enterRoom = async (room: Room) => {
   try {
-    // Navigate to the RoomPage with the roomId as a parameter
-    console.log("Entering room:", room);
-    console.log("user name:", user.value.name);
-    await router.push({ name: 'Room', params: { roomId: room.id}, query: { username: user.value.name}});
-
+    if (room.status === 'waiting') {
+      console.log("Entering room:", room);
+      console.log("user name:", user.value.name);
+      await router.push({ name: 'Room', params: { roomId: room.id}, query: { username: user.value.name}});
+    } else {
+      console.log(`Cannot enter room ${room.number}: Room is not in waiting status.`);
+      // Optionally alert the user
+      alert(`Cannot enter room ${room.number}: Room is currently ${room.status}.`);
+    }
   } catch (error) {
     console.error(error);
   }
 };
+
 
   </script>
 
