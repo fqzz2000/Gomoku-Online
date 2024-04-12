@@ -14,5 +14,5 @@ const gameServer = new GameServer(new Server(server, {
     methods: ["GET", "POST"], 
   }
 }));
-server.listen(port)
+server.listen(port,'0.0.0.0')
 console.log('Server listening on port', port);
