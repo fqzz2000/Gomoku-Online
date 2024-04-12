@@ -128,6 +128,7 @@ if (userName.value !== null)
 
 function leaveRoom() {
   gameSocket.leaveRoom(roomId, userName.value);
+  console.log('Leaving room:', roomId);
   router.push('/');
   gameSocket.disconnect();
 }
