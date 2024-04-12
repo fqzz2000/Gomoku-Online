@@ -18,7 +18,7 @@
             <b-card-text>
               <b-avatar :src="user1.avatar" size="4rem" class="mb-2"></b-avatar>
               <p>Games: {{ user1.games }}</p>
-              <p>Win Rate: {{ user1.winRate }}%</p>
+              <p>Win Rate: {{ user1.winRate.toFixed(2) }}%</p>
             </b-card-text>
           </b-card>
           <b-card no-body class="h-50 bg-info">
@@ -37,7 +37,7 @@
 import { onMounted, ref } from 'vue';
 import { GameSocket } from '../gameSocket'; 
 import { useRouter } from 'vue-router';
-//import axios from 'axios';
+
 
 import { Data } from "../data"
 
@@ -60,14 +60,14 @@ const username = route.query.username as string;
 const userName = ref<string>(username);
 
 const user1 = ref({
-  avatar: '../assets/images.png',
+  avatar: '/public/uploads/avatar1.png',
   name: 'Alice',
   games: 10,
   winRate: 70,
 });
 
 const user2 = ref({
-  avatar: '../assets/images.png',
+  avatar: '/public/uploads/avatar1.png',
   name: 'Bob',
   games: 20,
   winRate: 80,
@@ -79,25 +79,25 @@ const user2 = ref({
 
 
 
-const gameSocket = new GameSocket('http://localhost:8181');
+const gameSocket = new GameSocket('http://localhost:8181', localStorage.getItem('token') as string);
 
 onMounted(async () => {
 
   userName.value = username;
 
    
-  gameSocket.connect('your_jwt_token_here');
+  gameSocket.connect(localStorage.getItem('token') as string);
   gameSocket.onRoomInfo(async (roomInfo) => {
     // alert('Room Info: ' + JSON.stringify(roomInfo));
 
   user1.value.name = roomInfo.users[0].username;
-  let ret = await Data.fetchUserProfile(roomInfo.users[0].username);
+  let ret = await Data.fetchUserProfile(roomInfo.users[0].username, localStorage.getItem('token') as string);
   user1.value.games = ret.totalGame;
   user1.value.winRate = ret.winRate;
   user1.value.avatar = ret.avatar;
   if (roomInfo.users.length > 1) {
     user2.value.name = roomInfo.users[1].username;
-    let ret = await Data.fetchUserProfile(roomInfo.users[1].username);
+    let ret = await Data.fetchUserProfile(roomInfo.users[1].username, localStorage.getItem('token') as string);
     user2.value.games = ret.totalGame;
     user2.value.winRate = ret.winRate;
     user2.value.avatar = ret.avatar;

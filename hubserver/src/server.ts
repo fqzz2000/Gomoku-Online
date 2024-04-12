@@ -105,9 +105,12 @@ app.post('/api/login', async (req: Request, res: Response) => {
 
 //app.post('/api/login', loginUser);
 app.post('/api/rooms',authenticateJWT, createRoom);
-  app.get('/api/rooms',authenticateJWT, getRooms);
-  app.delete('/api/rooms/:id', authenticateJWT,deleteRoomById);
+app.get('/api/rooms',authenticateJWT, getRooms);
+app.delete('/api/rooms/:id', authenticateJWT,deleteRoomById);
 app.get('/api/rooms/:roomId',authenticateJWT, getRoomById);
+app.post('/api/authentication',authenticateJWT, (req, res) => {
+  return res.status(200).json(req.user);
+});
 
 
 
@@ -124,6 +127,10 @@ app.post('/api/rooms/:roomId/players/add', addPlayerToRoom);
 
 
 app.post('/api/rooms/:roomId/players/remove', removePlayerFromRoom);
+
+// static files
+app.use('/public', express.static('public'));
+
 mongoose.connect(url).then(() => {
     logger.info('Connected to MongoDB')
     app.listen(port, () => {

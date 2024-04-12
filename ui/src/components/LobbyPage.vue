@@ -21,10 +21,10 @@
       <b-col md="4">
         <b-card no-body class="mb-1" header="The User">
           <b-card-body class="text-center">
-            <b-avatar variant="info" size="4rem" class="mb-2"></b-avatar>
+            <b-avatar variant="info" size="4rem" class="mb-2" :src="user.avatar"></b-avatar>
             <p>Name: {{ user.name }}</p>
             <p>Games: {{ user.games }}</p>
-            <p>Win Rate: {{ user.winRate }}%</p>
+            <p>Win Rate: {{ user.winRate.toFixed(2) }}%</p>
           </b-card-body>
         </b-card>
         <b-card no-body header="More Profile or A chat room">
@@ -44,21 +44,16 @@
   import { getWithToken, postWithToken, deleteWithToken } from '../utils';
 
   const router = useRouter();
-  // import { useStore } from 'vuex';
-  // const store = useStore();
-  // const user = computed(() => store.state.user);
+
+
 
   onMounted(() => {
   //const username = localStorage.getItem('username'); 
   //const username=req.user.username;
-  fetchRooms(); 
+  fetchRooms();
   fetchUserInfo(); 
-});
-  // const rooms = ref([
-  //   { id: 1, number: 1, player: 'Alice', status: 'waiting' },
-  //   { id: 2, number: 2, player: 'Bob', status: 'playing' },
-  //   { id: 3, number: 3, player: 'Charlie', status: 'waiting' },
-  // ]);
+  });
+
   interface Room {
   id: string;
   number: string;
@@ -70,25 +65,31 @@ const rooms = ref<Room[]>([]);
 
  
   const user = ref({
-    avatar: '../assets/images.png',
+    avatar: '/public/uploads/avatar.png',
     name: 'Alice',
     games: 10,
     winRate: 70,
   });
 
 
-  async function fetchUserInfo(username: string) {
+
+  async function fetchUserInfo() {
     try {
+      const username = "xsasa";
       const response = await getWithToken(`/api/users/${username}`, localStorage.getItem('token') as string);
-      
-   
-    user.value = {
+
+      user.value = {
       avatar: response.data.avatar || '../assets/images.png', 
       name: response.data.username, 
       games: response.data.game_stats.total_games_played,
-      winRate: (response.data.game_stats.total_wins / response.data.game_stats.total_games_played) * 100
-    };
-    console.log('User info fetched:', response.data);
+      winRate: response.data.game_stats.total_games_played === 0 ? 0 : (response.data.game_stats.total_wins / response.data.game_stats.total_games_played) * 100
+
+
+      }
+      console.log('User info fetched:', response.data);
+    
+    
+  
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error('Failed to fetch user info:', error.response?.data.error);
@@ -176,6 +177,7 @@ const enterRoom = async (room: Room) => {
    
     console.error('Error entering room:', error);
     alert('Error entering room: An unknown error occurred.');
+
   }
 }
 };

@@ -53,11 +53,11 @@
             </b-card>
             <b-card-group deck>
               <b-card :header="user1.name" align="center">
-                <p>Win Rate: {{ user1.winRate }}</p>
+                <p>Win Rate: {{ Number(user1.winRate).toFixed(2) }} %</p>
                 <p>Total Games: {{ user1.games }}</p>
               </b-card>
               <b-card :header="user2.name" align="center">
-                <p>Win Rate: {{ user2.winRate }}</p>
+                <p>Win Rate: {{ Number(user2.winRate).toFixed(2) }} %</p>
                 <p>Total Games: {{ user2.games}} </p>
               </b-card>
             </b-card-group>
@@ -90,6 +90,8 @@ const user2 = ref({
     games : route.query.user2games,
     winRate : route.query.user2winRate
 })
+
+
   // alert(userId);
 
   const currentPlayer = ref('Alice');
@@ -100,7 +102,7 @@ const user2 = ref({
   let timer = null;
   
   // 初始化棋盘
-  const gameSocket = new GameSocket('http://localhost:8181');
+  const gameSocket = new GameSocket('http://localhost:8181', localStorage.getItem('token'));
   onMounted(() => {
     // initialize the chessboard
     for (let i = 0; i < 15; i++) {
@@ -109,7 +111,7 @@ const user2 = ref({
       }
     }
     // connect to the server
-    gameSocket.connect("your_jwt_token_here");
+    gameSocket.connect(localStorage.getItem('token'));
     gameSocket.onGameStart((res) => {
 
       console.log('Game started');
