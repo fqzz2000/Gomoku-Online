@@ -36,7 +36,8 @@ const logger = pino({
 })
 const authenticateJWT = (req: Request, res: Response, next:NextFunction) => {
   const authHeader = req.headers.authorization;
-
+  // print out the entire request object
+  console.log("Request object: ", req.headers);
   if (authHeader) {
     const token = authHeader.split(' ')[1];
 
