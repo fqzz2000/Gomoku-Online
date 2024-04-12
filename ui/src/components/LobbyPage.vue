@@ -19,17 +19,11 @@
 
       <!-- User Profile/Chat Section -->
       <b-col md="4">
-        <b-card no-body class="mb-1" header="The User">
-          <b-card-body class="text-center">
-            <b-avatar variant="info" size="4rem" class="mb-2" :src="user.avatar"></b-avatar>
-            <p>Name: {{ user.name }}</p>
-            <p>Games: {{ user.games }}</p>
-            <p>Win Rate: {{ user.winRate.toFixed(2) }}%</p>
-          </b-card-body>
-        </b-card>
+        <ProfileBlock :user="user" :enable-edit="true" />
         <b-card no-body header="More Profile or A chat room">
           <!-- Chat or profile content here -->
         </b-card>
+
       </b-col>
     </b-row>
   </b-container>
@@ -42,7 +36,7 @@
   import { toRaw } from 'vue';
   import { useRouter } from 'vue-router';
   import { getWithToken, postWithToken, deleteWithToken } from '../utils';
-
+  import ProfileBlock from './ProfileBlock.vue';
   const router = useRouter();
 
 

@@ -14,13 +14,7 @@
   
         <!-- Profile/Chat Section -->
         <b-col cols="4" class="bg-secondary">
-          <b-card no-body class="h-50 d-flex flex-column align-items-center justify-content-center">
-            <b-card-text>
-              <b-avatar :src="user1.avatar" size="4rem" class="mb-2"></b-avatar>
-              <p>Games: {{ user1.games }}</p>
-              <p>Win Rate: {{ user1.winRate.toFixed(2) }}%</p>
-            </b-card-text>
-          </b-card>
+          <ProfileBlock :user="user1" :enable-edit="false" />
           <b-card no-body class="h-50 bg-info">
             <b-card-header class="h-100 d-flex align-items-center justify-content-center">
               More Profile or A chat room
@@ -37,6 +31,7 @@
 import { onMounted, ref } from 'vue';
 import { GameSocket } from '../gameSocket'; 
 import { useRouter } from 'vue-router';
+import ProfileBlock from './ProfileBlock.vue';
 
 
 import { Data } from "../data"
