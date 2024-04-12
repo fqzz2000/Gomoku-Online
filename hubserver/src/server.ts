@@ -9,7 +9,7 @@ import { UserController,registerUser, loginUser } from './controllers/UserContro
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import Room from './models/RoomModel';
 
-import {createRoom,deleteRoomById,getRoomById,getRooms, RoomController } from './controllers/RoomController';
+import {createRoom,deleteRoomById,getRoomById,getRooms, RoomController,addPlayerToRoom ,removePlayerFromRoom} from './controllers/RoomController';
 
 // set up Mongo
 
@@ -119,6 +119,11 @@ app.post("/api/UpdateGameResult", async (req: Request, res: Response) => {
 app.post("/api/UpdateRoomState", async (req: Request, res: Response) => {
   roomController.updateRoomInfo(req, res);
 })
+
+app.post('/api/rooms/:roomId/players/add', addPlayerToRoom);
+
+
+app.post('/api/rooms/:roomId/players/remove', removePlayerFromRoom);
 mongoose.connect(url).then(() => {
     logger.info('Connected to MongoDB')
     app.listen(port, () => {
