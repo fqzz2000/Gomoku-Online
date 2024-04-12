@@ -98,7 +98,9 @@ export class UserController {
   public async getUserProfile(req: Request, res: Response): Promise<void> {
     try {
       console.log('Request received');
-      const username = req.params.username;
+
+     // const username = req.params.username;
+      const username=req.user.username;
       console.log('start to get user: ', username);
       const user = await this.userService.getUserByUsername(username);
       console.log('User found:', user);
