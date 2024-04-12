@@ -1,12 +1,23 @@
 import jwt from 'jsonwebtoken';
-
+import axios from 'axios';
+import { User } from '../../ui/src/common';
 export class AuthService {
-  verifyToken(token: string): boolean {
+  public async verifyToken(token: string): Promise<string|false> {
     try {
-      // Assuming SECRET_KEY is your secret key for JWT
-      // jwt.verify(token, process.env.SECRET_KEY);
-      return true;
+      // http post request to verify token
+      const response = await axios.post('http://localhost:8131/api/authentication', {}, {
+        headers:{
+          Authorization: `Bearer ${token}`
+        }
+      })
+      console.log("response from authentication:", response.data);
+
+      return response.data.username;
     } catch (error) {
+      if (error instanceof Error) {
+        console.error("authentication failed in AuthService:");
+        console.error(error.message);
+      }
       return false;
     }
   }

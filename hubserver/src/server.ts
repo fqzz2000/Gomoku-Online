@@ -103,9 +103,12 @@ app.post('/api/login', async (req: Request, res: Response) => {
 
 //app.post('/api/login', loginUser);
 app.post('/api/rooms',authenticateJWT, createRoom);
-  app.get('/api/rooms',authenticateJWT, getRooms);
-  app.delete('/api/rooms/:id', authenticateJWT,deleteRoomById);
+app.get('/api/rooms',authenticateJWT, getRooms);
+app.delete('/api/rooms/:id', authenticateJWT,deleteRoomById);
 app.get('/api/rooms/:roomId',authenticateJWT, getRoomById);
+app.post('/api/authentication',authenticateJWT, (req, res) => {
+  return res.status(200).json(req.user);
+});
 
 
 
