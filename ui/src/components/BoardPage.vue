@@ -53,12 +53,12 @@
             </b-card>
             <b-card-group deck>
               <b-card :header="user1.name" align="center">
-                <p>Win Rate: {{ user1.winRate }}</p>
+                <p>Win Rate: {{ user1.winRate.toFixed(2) }}</p>
                 <p>Total Games: {{ user1.games }}</p>
               </b-card>
               <b-card :header="user2.name" align="center">
                 <p>Win Rate: {{ user2.winRate }}</p>
-                <p>Total Games: {{ user2.games}} </p>
+                <p>Total Games: {{ user2.games.toFixed(2)}} </p>
               </b-card>
             </b-card-group>
             <b-button v-if="gameEnded" @click="leaveRoom">Leave Room</b-button>

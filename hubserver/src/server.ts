@@ -117,6 +117,11 @@ app.post("/api/UpdateGameResult", async (req: Request, res: Response) => {
 app.post("/api/UpdateRoomState", async (req: Request, res: Response) => {
   roomController.updateRoomInfo(req, res);
 })
+
+// static files
+app.use('/public', express.static('public'));
+
+
 mongoose.connect(url).then(() => {
     logger.info('Connected to MongoDB')
     app.listen(port, () => {

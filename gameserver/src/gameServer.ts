@@ -53,6 +53,7 @@ export class GameServer {
           socket.emit('error', 'Room not found');
           return;
         }
+        socket.join(roomId);
         socket.emit('gameState', { board: room.game.getBoard(), round: room.game.getRound() });
       });
       socket.on('joinRoom', (req) => {

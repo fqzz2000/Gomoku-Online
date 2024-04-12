@@ -27,6 +27,7 @@ export const registerUser = async (req: Request, res: Response) => {
   const user = new User({
     username,
     password: hashedPassword,
+    avatar: "/public/uploads/avatar.png",
     email,
     game_stats: defaultGameStats,
   });

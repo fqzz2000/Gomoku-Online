@@ -18,7 +18,7 @@
             <b-card-text>
               <b-avatar :src="user1.avatar" size="4rem" class="mb-2"></b-avatar>
               <p>Games: {{ user1.games }}</p>
-              <p>Win Rate: {{ user1.winRate }}%</p>
+              <p>Win Rate: {{ user1.winRate.toFixed(2) }}%</p>
             </b-card-text>
           </b-card>
           <b-card no-body class="h-50 bg-info">
@@ -60,14 +60,14 @@ const username = route.query.username as string;
 const userName = ref<string>(username);
 
 const user1 = ref({
-  avatar: '../assets/images.png',
+  avatar: '/public/uploads/avatar1.png',
   name: 'Alice',
   games: 10,
   winRate: 70,
 });
 
 const user2 = ref({
-  avatar: '../assets/images.png',
+  avatar: '/public/uploads/avatar1.png',
   name: 'Bob',
   games: 20,
   winRate: 80,

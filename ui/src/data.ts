@@ -13,7 +13,7 @@ export class Data {
               const response = await getWithToken(`/api/users/${username}`,token);
                 ret.username = response.data.username;
               ret.totalGame = response.data.game_stats.total_games_played;
-              if (response.data.total_games_played > 0) {
+              if (response.data.game_stats.total_games_played > 0) {
                 ret.winRate = (response.data.game_stats.total_wins / response.data.game_stats.total_games_played) * 100;
             } 
             console.log("User info fetched:", ret);

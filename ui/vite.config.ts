@@ -28,6 +28,11 @@ export default defineConfig({
         target: 'http://localhost:8131', // 后端服务器地址
         changeOrigin: true,
         // rewrite: (path) => path.replace(/^\/api/, '')
+      },
+      "/public": {
+        target: "http://localhost:8131",
+        changeOrigin: true,
+        // rewrite: (path) => path.replace(/^\/public/, '')
       }
     }
   },
