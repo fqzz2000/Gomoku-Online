@@ -21,10 +21,10 @@
       <b-col md="4">
         <b-card no-body class="mb-1" header="The User">
           <b-card-body class="text-center">
-            <b-avatar variant="info" size="4rem" class="mb-2"></b-avatar>
+            <b-avatar variant="info" size="4rem" class="mb-2" :src="user.avatar"></b-avatar>
             <p>Name: {{ user.name }}</p>
             <p>Games: {{ user.games }}</p>
-            <p>Win Rate: {{ user.winRate }}%</p>
+            <p>Win Rate: {{ user.winRate.toFixed(2) }}%</p>
           </b-card-body>
         </b-card>
         <b-card no-body header="More Profile or A chat room">
@@ -64,7 +64,7 @@ const rooms = ref<Room[]>([]);
 
  
   const user = ref({
-    avatar: '../assets/images.png',
+    avatar: '/public/uploads/avatar.png',
     name: 'Alice',
     games: 10,
     winRate: 70,
@@ -80,6 +80,8 @@ const rooms = ref<Room[]>([]);
       name: response.data.username, 
       games: response.data.game_stats.total_games_played,
       winRate: response.data.game_stats.total_games_played === 0 ? 0 : (response.data.game_stats.total_wins / response.data.game_stats.total_games_played) * 100
+
+
       }
       console.log('User info fetched:', response.data);
     
@@ -113,8 +115,6 @@ const addRoom = async () => {
     console.log("Adding a new room, token:", localStorage.getItem('token'));
     const maxNumber = rooms.value.reduce((max, room) => Math.max(max, Number(room.number)), 0);
     const newNumber = maxNumber + 1;
-
-
     const response = await postWithToken('/api/rooms', { number: newNumber.toString(), player: user.value.name}, localStorage.getItem('token') as string);
     // const response = await axios.post('/api/rooms', { number: newNumber.toString(), player: user.value.name},  {headers: {
   //   Authorization: `Bearer ${localStorage.getItem('token')}`
