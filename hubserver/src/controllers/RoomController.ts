@@ -125,6 +125,7 @@ export const removePlayerFromRoom = async (req: Request, res: Response) => {
             res.status(200).json(room);
         } else {
             res.status(401).json({ message: "Room not found" });
+
         }
     } catch (error) {
         console.error("Error in controller removing player from room:", error);
