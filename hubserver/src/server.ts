@@ -112,6 +112,10 @@ app.post('/api/authentication',authenticateJWT, (req, res) => {
   return res.status(200).json(req.user);
 });
 
+app.post('/api/users/updateProfile', authenticateJWT, async (req: Request, res: Response) => {
+  userController.updateUserProfile(req, res);
+})
+
 
 
 app.post("/api/UpdateGameResult", async (req: Request, res: Response) => {
@@ -127,6 +131,8 @@ app.post('/api/rooms/:roomId/players/add', addPlayerToRoom);
 
 
 app.post('/api/rooms/players/remove', removePlayerFromRoom);
+
+
 
 
 // static files

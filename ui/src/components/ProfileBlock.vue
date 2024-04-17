@@ -16,6 +16,7 @@
         <h5>{{ user.name }}</h5>
         <p>Games Played: {{ user.games }}</p>
         <p>Win Rate: {{ user.winRate.toFixed(2) }}%</p>
+        <p v-if="user.email">Email: {{ user.email }}</p>
       </b-card-text>
       <b-button v-if="enableEdit" variant="primary">Edit Profile</b-button>
 
@@ -28,6 +29,7 @@
             name: string;
             games: number;
             winRate: number;
+            email?: string;
         };
         enableEdit: boolean;
     }>();

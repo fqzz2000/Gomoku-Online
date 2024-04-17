@@ -59,6 +59,7 @@ const user1 = ref({
   name: 'Alice',
   games: 10,
   winRate: 70,
+  email: "123@123.com"
 });
 
 const user2 = ref({
@@ -66,6 +67,7 @@ const user2 = ref({
   name: 'Bob',
   games: 20,
   winRate: 80,
+  email: "123@123.com"
 });
 //const userName = "User"+Math.floor(Math.random() * 1000)
 // userid is a uuid

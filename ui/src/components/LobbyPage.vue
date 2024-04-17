@@ -63,6 +63,7 @@ const rooms = ref<Room[]>([]);
     name: 'Alice',
     games: 10,
     winRate: 70,
+    email: "123@123.com"
   });
 
 
@@ -76,8 +77,8 @@ const rooms = ref<Room[]>([]);
       avatar: response.data.avatar || '../assets/images.png', 
       name: response.data.username, 
       games: response.data.game_stats.total_games_played,
-      winRate: response.data.game_stats.total_games_played === 0 ? 0 : (response.data.game_stats.total_wins / response.data.game_stats.total_games_played) * 100
-
+      winRate: response.data.game_stats.total_games_played === 0 ? 0 : (response.data.game_stats.total_wins / response.data.game_stats.total_games_played) * 100,
+      email: response.data.email
 
       }
       console.log('User info fetched:', response.data);

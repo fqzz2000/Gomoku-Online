@@ -8,9 +8,6 @@
         <div class="col-md-6">
           <h2>Update Info</h2>
           <b-form @submit.prevent="updateProfile">
-            <b-form-group label="Update Name:" label-for="input-name">
-              <b-form-input id="input-name" v-model="form.name" required placeholder="Please input your name"></b-form-input>
-            </b-form-group>
             <b-form-group label = "Input Old Password: " label-for="input-old-password">
               <b-form-input id="input-old-password" type="password" v-model="form.password" required placeholder="Please input your password"></b-form-input>
             </b-form-group>
@@ -20,7 +17,7 @@
             <b-form-group label="Verify New Password:" label-for="input-confirm-password">
                 <b-form-input id="input-confirm-password" 
                 type="password" 
-                v-model="form.confirmedPassword"
+                v-model="confirmedPassword"
                 :class="{'is-invalid': !passwordMatch}"
                 required 
                 placeholder="Please input your password"></b-form-input>
@@ -41,24 +38,41 @@
 <script setup lang="ts">
     import { computed, ref } from 'vue';
     import ProfileBlock from './ProfileBlock.vue';
+    import { postWithToken } from '../utils';
+import { Data } from '../data';
+    const confirmedPassword = ref('');
     const user = ref({
         avatar: '/public/uploads/avatar.png',
 
       name: '张三',
       games: 10,
         winRate: 70,
+        email:""
     });
     const form = ref({
-      name: '',
       password: '',
       email: '',
       newPassword: '',
-      confirmedPassword: ''
+
+      avatar: '/public/uploads/avatar.png',
     });
 
-    const passwordMatch = computed(() => form.value.newPassword === form.value.confirmedPassword);
-    function updateProfile() {
-      user.value.name = form.value.name;
+    const passwordMatch = computed(() => form.value.newPassword=== confirmedPassword.value);
+    async function updateProfile() {
+      const res = await postWithToken('/api/users/updateProfile', form.value, localStorage.getItem('token') as string)
+      if ( res === null) {
+        alert('Update failed');
+      } else if (res.status === 200) {
+        alert('Update successfully');
+      } 
+      const ret = await Data.fetchUserProfile("321", localStorage.getItem('token') as string);
+      user.value = {
+        avatar: ret.avatar || '../assets/images.png', 
+        name: ret.username, 
+        games: ret.totalGame,
+        winRate: ret.winRate,
+        email: ret.email
+      }
     }
 </script>
 

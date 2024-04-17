@@ -8,7 +8,8 @@ export class Data {
                 username : "",
                 avatar : "",
                 totalGame : 0 ,
-                winRate : 0};
+                winRate : 0,
+                email : ""};
             try {
               const response = await getWithToken(`/api/users/${username}`,token);
               ret.avatar = response.data.avatar;
@@ -17,6 +18,7 @@ export class Data {
               if (response.data.game_stats.total_games_played > 0) {
                 ret.winRate = (response.data.game_stats.total_wins / response.data.game_stats.total_games_played) * 100;
             } 
+              ret.email = response.data.email;
             console.log("User info fetched:", ret);
             } catch (error) {
               if (error instanceof Error) {
