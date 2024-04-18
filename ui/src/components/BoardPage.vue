@@ -61,6 +61,8 @@
                 <p>Total Games: {{ user2.games}} </p>
               </b-card>
             </b-card-group>
+            <!-- <ProfileBlock :user="user1" :enable-edit="false" />
+            <ProfileBlock :user="user2" :enable-edit="false" /> -->
             <b-button v-if="gameEnded" @click="leaveRoom">Leave Room</b-button>
           </b-col>
         </b-row>
@@ -74,6 +76,7 @@
   import { GameSocket } from '../gameSocket';
   import { routerKey, useRoute, useRouter } from 'vue-router';
   import { Data } from '../data';
+  import ProfileBlock from './ProfileBlock.vue';
   const router = useRouter();
   const route = useRoute();
   const roomId = route.query.roomId;
@@ -82,13 +85,13 @@
     name: route.query.user1name,
     avatar : route.query.user1avatar,
     games : route.query.user1games,
-    winRate : route.query.user1winRate
+    winRate : Number(route.query.user1winRate)
   })
 const user2 = ref({
     name: route.query.user2name,
     avatar : route.query.user2avatar,
     games : route.query.user2games,
-    winRate : route.query.user2winRate
+    winRate : Number(route.query.user2winRate)
 })
 
 

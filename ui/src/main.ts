@@ -12,6 +12,7 @@ import RoomPage from './components/RoomPage.vue'
 import LoginPage from './components/LoginPage.vue'
 import BoardPage from './components/BoardPage.vue'
 import RegisterPage from './components/RegisterPage.vue'
+import ProfilePage from './components/ProfilePage.vue'
 import store from './store';
 //import store from './store'
 createApp(App).use(store).mount('#app');
@@ -59,6 +60,11 @@ const routes = [
         path: '/login',
         name: 'Login',
         component: LoginPage
+      },
+      {
+        path: "/profile",
+        name: "Profile",
+        component: ProfilePage
       }
 
 ]
