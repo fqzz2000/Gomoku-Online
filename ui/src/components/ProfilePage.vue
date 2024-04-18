@@ -3,7 +3,7 @@
       <div class="row">
         <div class="col-md-6">
           <h2>Profile</h2>
-          <ProfileBlock :user="user" :enableEdit="false" />
+          <ProfileBlock :user="user" :enableEdit="false" :enableUpload="true" @avatar-updated="handleAvatarUpdated"/>
         </div>
         <div class="col-md-6">
           <h2>Update Info</h2>
@@ -30,20 +30,23 @@
             </b-form-group>
             <b-button type="submit" variant="primary">Submit</b-button>
           </b-form>
+          <b-button @click="backToLobby">Return</b-button>
         </div>
       </div>
     </div>
+
 </template>
 
 <script setup lang="ts">
-    import { computed, ref } from 'vue';
+    import { computed, onMounted, ref } from 'vue';
     import ProfileBlock from './ProfileBlock.vue';
     import { postWithToken } from '../utils';
 import { Data } from '../data';
+import { useRouter } from 'vue-router';
+const router = useRouter();
     const confirmedPassword = ref('');
     const user = ref({
         avatar: '/public/uploads/avatar.png',
-
       name: '张三',
       games: 10,
         winRate: 70,
@@ -58,6 +61,18 @@ import { Data } from '../data';
     });
 
     const passwordMatch = computed(() => form.value.newPassword=== confirmedPassword.value);
+
+    onMounted(async () => {
+      const ret = await Data.fetchUserProfile("321", localStorage.getItem('token') as string);
+      user.value = {
+        avatar: ret.avatar || '../assets/images.png', 
+        name: ret.username, 
+        games: ret.totalGame,
+        winRate: ret.winRate,
+        email: ret.email
+      }
+    });
+
     async function updateProfile() {
       const res = await postWithToken('/api/users/updateProfile', form.value, localStorage.getItem('token') as string)
       if ( res === null) {
@@ -73,6 +88,16 @@ import { Data } from '../data';
         winRate: ret.winRate,
         email: ret.email
       }
+    }
+
+    function handleAvatarUpdated(avatar: string) {
+      user.value.avatar = avatar;
+      form.value.avatar = avatar;
+      console.log('Avatar updated:', avatar);
+    }
+
+    function backToLobby() {
+      router.push('/');
     }
 </script>
 

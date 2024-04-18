@@ -19,7 +19,7 @@
 
       <!-- User Profile/Chat Section -->
       <b-col md="4">
-        <ProfileBlock :user="user" :enable-edit="true" />
+        <ProfileBlock :user="user" :enable-edit="true" :enable-upload="false"/>
         <b-card no-body header="More Profile or A chat room">
           <!-- Chat or profile content here -->
         </b-card>
