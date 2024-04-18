@@ -12,6 +12,7 @@ import User from '../models/UserModel';
 
 export const registerUser = async (req: Request, res: Response) => {
   const { username, password, email } = req.body;
+
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -70,6 +71,33 @@ export class UserController {
   constructor() {
     this.userService = new UserService();
   }
+
+  public async updateUserProfile(req: Request, res: Response): Promise<void> {
+    console.log('Request received');
+    const { password, email, avatar, newPassword } = req.body;
+    const username = req.user.username;
+    const user = await User.findOne({ username }).exec();
+    if (!(user && await bcrypt.compare(password, user.password))) {
+      res.status(401).json({ message: 'Authentication failed' });
+      return;
+    }
+
+    console.log('start to update user: ', user.username);
+    try {
+
+      const user = await this.userService.updateUserProfile(username, newPassword, email, avatar);
+      console.log('User updated:', user);
+      res.json(user);
+    } catch (error) {
+      console.error('Error updating user:', error);
+      if (error instanceof Error) {
+        res.status(500).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'An unknown error occurred' });
+      }
+    }
+  }
+
 
   public async updateGameResult(req: Request, res: Response): Promise<void> {
     console.log("received request to update Game Result")

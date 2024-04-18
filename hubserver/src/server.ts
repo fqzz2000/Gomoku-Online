@@ -8,6 +8,7 @@ import mongoose from 'mongoose'
 import { UserController,registerUser, loginUser } from './controllers/UserController';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import Room from './models/RoomModel';
+import multer from 'multer';
 
 import {createRoom,deleteRoomById,getRoomById,getRooms, RoomController,addPlayerToRoom ,removePlayerFromRoom} from './controllers/RoomController';
 
@@ -112,6 +113,10 @@ app.post('/api/authentication',authenticateJWT, (req, res) => {
   return res.status(200).json(req.user);
 });
 
+app.post('/api/users/updateProfile', authenticateJWT, async (req: Request, res: Response) => {
+  userController.updateUserProfile(req, res);
+})
+
 
 
 app.post("/api/UpdateGameResult", async (req: Request, res: Response) => {
@@ -129,7 +134,26 @@ app.post('/api/rooms/:roomId/players/add', addPlayerToRoom);
 app.post('/api/rooms/players/remove', removePlayerFromRoom);
 
 
+
+
 // static files
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/uploads/')
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, file.fieldname + '-' + uniqueSuffix + '.' + file.originalname.split('.').pop())
+  }
+});
+const upload = multer({ storage: storage });
+// 定义上传接口
+app.post('/api/upload-avatar', upload.single('avatar'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+  res.send({message : 'File uploaded successfully', filename: req.file.filename});
+});
 app.use('/public', express.static('public'));
 
 mongoose.connect(url).then(() => {

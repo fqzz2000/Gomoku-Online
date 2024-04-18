@@ -4,4 +4,5 @@ export interface User {
     avatar: string;
     totalGame: number;
     winRate: number;
+    email: string;
 }
