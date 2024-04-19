@@ -20,6 +20,10 @@ import { Issuer, Strategy, generators } from 'openid-client';
 import passport from 'passport';
 import session from 'express-session';
 import { gitlab } from "./secrets"
+import jwksClient from 'jwks-rsa';
+import { JwtHeader } from 'jsonwebtoken';
+//import { SigningKeyCallback } from 'jwks-rsa';
+//import { Key } from 'jwks-rsa';
 const url = 'mongodb://127.0.0.1:27017'
 
 // set up Express
@@ -51,19 +55,19 @@ const logger = pino({
 })
 
 
-app.use(session({
-  secret: 'a just so-so secret',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false },
+// app.use(session({
+//   secret: 'a just so-so secret',
+//   resave: false,
+//   saveUninitialized: true,
+//   cookie: { secure: false },
 
-  // the default store is memory-backed, so all sessions will be forgotten every time the server restarts
-  // uncomment the following to use a Mongo-backed store that will work with a load balancer
-  // store: MongoStore.create({
-  //   mongoUrl: 'mongodb://127.0.0.1:27017',
-  //   ttl: 14 * 24 * 60 * 60 // 14 days
-  // })
-}))
+//   // the default store is memory-backed, so all sessions will be forgotten every time the server restarts
+//   // uncomment the following to use a Mongo-backed store that will work with a load balancer
+//   // store: MongoStore.create({
+//   //   mongoUrl: 'mongodb://127.0.0.1:27017',
+//   //   ttl: 14 * 24 * 60 * 60 // 14 days
+//   // })
+// }))
 declare module 'express-session' {
   export interface SessionData {
     credits?: number
@@ -99,7 +103,7 @@ Issuer.discover("https://coursework.cs.duke.edu/").then(issuer => {
   
       // 假设你想把 access_token 和 id_token 存储起来
       const user = {
-        id: userInfo.sub, // OIDC "sub" (subject) 通常是用户的唯一标识符
+        id: userInfo.sub, 
         username: userInfo.preferred_username || userInfo.name,
         email: userInfo.email,
         accessToken: tokenSet.access_token,
@@ -160,25 +164,59 @@ app.get('/login-callback', passport.authenticate('oidc', {
 }), (req, res) => {
   // 检查 user 对象是否包括令牌信息
 
-  if (req.user && req.user.accessToken) {
+  if (req.user && req.user.idToken) {
     // 注意安全风险，仅在安全的环境下这样做
     req.session.user = req.user; 
-    res.redirect(`http://localhost:5173/?token=${req.user.accessToken}`);
+    res.redirect(`http://localhost:5173/?token=${req.user.idToken}`);
   } else {
     res.redirect('/login?error=token_missing');
   }
 });
 
+//const jwksClient = require('jwks-rsa');
+
+// 创建 JWKS 客户端
+const client = jwksClient({
+  jwksUri: 'https://coursework.cs.duke.edu/.well-known/jwks.json'
+});
+interface MyHeader extends JwtHeader {
+  kid?: string;
+}
+
+function getKey(header: MyHeader, callback: (err: Error | null, key?: string) => void){
+  if (header.alg === 'RS256') {
+    client.getSigningKey(header.kid, (err, key) => {
+      if (err) {
+        callback(err, undefined);
+        return;
+      }
+      if (!key) {
+        callback(new Error('Signing key not found'), undefined);
+        return;
+      }
+      // 正确获取 RSA 公钥
+      const signingKey = key.getPublicKey();
+      console.log("this is the public key:",signingKey);
+      callback(null, signingKey);
+    });
+  } else {
+    // 对于非 RS256 算法，使用本地密钥
+    callback(null, secretKey);
+  }
+}
+
+
+
 
 const authenticateJWT = (req: Request, res: Response, next:NextFunction) => {
   
-  if (req.session && req.session.user) {
-    req.user = req.session.user;
-    console.log("username in middleware is:", req.user.username);
-    return next();
-}
+//   if (req.session && req.session.user) {
+//     req.user = req.session.user;
+//     console.log("username in middleware is:", req.user.username);
+//     return next();
+// }
   
-  
+
   
   
   const authHeader = req.headers.authorization;
@@ -210,6 +248,59 @@ const authenticateJWT = (req: Request, res: Response, next:NextFunction) => {
 
   }
 };
+// if (authHeader) {
+
+//       const token = authHeader.split(' ')[1];
+//       console.log("start verify token:", token);
+  
+//       // 尝试使用 OIDC JWKS 或本地密钥验证 token
+//       jwt.verify(token, getKey, 
+//         // {
+//         // audience: '5d44e78f444d228c5ca337ce6d0cb96f4d9231a5403734becf20fdff2fd44e6b', // 你的预期受众
+//         // issuer: 'https://coursework.cs.duke.edu', // 你的 OIDC 发行者
+//         // algorithms: ['RS256', 'HS256'] }, 
+//         (err, decoded) => {
+//         if (err) {
+//           console.error("Token verification failed:", err);
+//           return res.sendStatus(403);
+//         }
+  
+//         // 你可以根据情况调整下面的属性名称，以适应你的用户模型
+//         req.user = decoded as IUser;
+//         console.log("Token is valid. User:", req.user.name);
+//         next();
+//       });
+//     } else {
+//       console.log("No token provided");
+//       res.sendStatus(401);
+//     }
+//   };
+//   if (authHeader) {
+//     const token = authHeader.split(' ')[1];
+
+//     // 尝试使用 OIDC JWKS 或本地密钥验证 token
+//     jwt.verify(token, getKey, {
+//       audience: '5d44e78f444d228c5ca337ce6d0cb96f4d9231a5403734becf20fdff2fd44e6b', // 你的预期受众
+//       issuer: 'https://coursework.cs.duke.edu', // 你的 OIDC 发行者
+//       algorithms: ['RS256', 'HS256']  // 支持的算法
+//     }, (err, decoded) => {
+//       if (err) {
+//         console.error("Token verification failed:", err);
+//         return res.sendStatus(403);
+//       }
+
+//       // 你可以根据情况调整下面的属性名称，以适应你的用户模型
+//       req.user = decoded as IUser;
+//       console.log("Token is valid. User:", req.user.name);
+//       next();
+//     });
+//   } else {
+//     console.log("No token provided");
+//     res.sendStatus(401);
+//   }
+// };
+
+
 
 app.get("/",authenticateJWT,(req, res) => {
 
@@ -217,7 +308,7 @@ app.get("/",authenticateJWT,(req, res) => {
   res.send("Hello World")
 })
 //app.get('/api/users',authenticateJWT,(req, res) => (userController.getUserProfile(req, res)));
-app.get('/api/users', authenticateJWT, (req, res) => {
+app.get('/api/users/${username}', authenticateJWT, (req, res) => {
   console.log("reached api/user end");
   if (req.user) {
     console.log("username in api:", req.user.username);
@@ -262,6 +353,7 @@ app.get('/api/rooms',authenticateJWT, getRooms);
 app.delete('/api/rooms/:id', authenticateJWT,deleteRoomById);
 app.get('/api/rooms/:roomId',authenticateJWT, getRoomById);
 app.post('/api/authentication',authenticateJWT, (req, res) => {
+  console.log("reached authentication ");
   return res.status(200).json(req.user);
 });
 

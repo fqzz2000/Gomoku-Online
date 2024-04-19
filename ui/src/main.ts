@@ -21,22 +21,22 @@ const routes = [
         path: '/',
         name: 'Lobby',
         component: LobbyPage,
-        beforeEnter: (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
-            const token = to.query.token as string | undefined;
-            if (token) {
-              localStorage.setItem('token', token);
+        // beforeEnter: (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+        //     const token = to.query.token as string | undefined;
+        //     if (token) {
+        //       localStorage.setItem('token', token);
           
-              console.log("token is:",token);
-              delete to.query.token;
-              next({ ...to, replace: true });
-            } else {
+        //       console.log("token is:",token);
+        //       delete to.query.token;
+        //       next({ ...to, replace: true });
+        //     } else {
 
-              console.log("no token");
-              const token2=localStorage.getItem('token') ;
-              console.log("stored token is:",token2);
-              next();
-            }
-          }
+        //       console.log("no token");
+        //       const token2=localStorage.getItem('token') ;
+        //       console.log("stored token is:",token2);
+        //       next();
+        //     }
+        //   }
         
     },
     {
