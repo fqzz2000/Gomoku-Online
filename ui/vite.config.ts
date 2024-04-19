@@ -20,7 +20,6 @@ export default defineConfig({
     }),
   ],
   server: {
-    host: '0.0.0.0',
     watch: {
       usePolling: true,
     },
@@ -34,7 +33,13 @@ export default defineConfig({
         target: "http://localhost:8131",
         changeOrigin: true,
         // rewrite: (path) => path.replace(/^\/public/, '')
+      },
+      "/login/oidc": {
+        target: 'http://localhost:8131',
+        changeOrigin: true,
+       // rewrite: path => path.replace(/^\/login\/oidc/, '/login/oidc')
       }
     }
   },
+  
 })

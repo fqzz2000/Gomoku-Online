@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory,RouteRecordRaw, RouteLocationNormalized, NavigationGuardNext } from 'vue-router'
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue'
 
 import 'bootstrap/dist/css/bootstrap.css'
@@ -21,7 +21,19 @@ const routes = [
     {
         path: '/',
         name: 'Lobby',
-        component: LobbyPage
+        component: LobbyPage,
+        beforeEnter: (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+            const token = to.query.token as string | undefined;
+            if (token) {
+              localStorage.setItem('token', token);
+              // 删除 token 参数后继续导航
+              delete to.query.token;
+              next({ ...to, replace: true });
+            } else {
+              next();
+            }
+          }
+        
     },
     {
         path: '/room/:roomId',
