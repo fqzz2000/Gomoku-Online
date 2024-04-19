@@ -73,7 +73,7 @@ const authenticateJWT = (req: Request, res: Response, next:NextFunction) => {
 app.get("/", authenticateJWT,(req, res) => {
   res.send("Hello World")
 })
-app.get('/api/users/:username',authenticateJWT,(req, res) => (userController.getUserProfile(req, res)));
+app.get('/api/users',authenticateJWT,(req, res) => (userController.getUserProfile(req, res)));
 
 
 

@@ -75,8 +75,8 @@ const rooms = ref<Room[]>([]);
 
   async function fetchUserInfo() {
     try {
-      const username = "xsasa";
-      const response = await getWithToken(`/api/users/${username}`, localStorage.getItem('token') as string);
+      //const username = "xsasa";
+      const response = await getWithToken(`/api/users`, localStorage.getItem('token') as string);
 
       user.value = {
       avatar: response.data.avatar || '../assets/images.png', 
