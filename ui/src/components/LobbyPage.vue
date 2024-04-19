@@ -49,7 +49,7 @@
 
   onMounted(() => {
   //const username = localStorage.getItem('username'); 
-  // const username=req.user.username;
+  //const username=req.user.username;
   fetchRooms();
   fetchUserInfo(); 
   });
@@ -75,11 +75,10 @@ const rooms = ref<Room[]>([]);
 
   async function fetchUserInfo() {
     try {
-      //const username = "xsasa";
+      const username = "xsasa";
       
       console.log('User info is fetching');
       const response = await getWithToken(`/api/users/${username}`, localStorage.getItem('token') as string);
-
 
       user.value = {
       avatar: response.data.avatar || '../assets/images.png', 
