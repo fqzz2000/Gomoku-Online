@@ -105,8 +105,41 @@ Issuer.discover("https://coursework.cs.duke.edu/").then(issuer => {
         accessToken: tokenSet.access_token,
         idToken: tokenSet.id_token
     };
+    
   
-      return done(null, user); // 现在 enrichedUser 包括了令牌信息
+     // return done(null, user); // 现在 enrichedUser 包括了令牌信息
+     User.findOne({ email: userInfo.email }, async (err:Error | null, existingUser:IUser) => {
+      if (err) {
+        return done(err, null);
+      }
+      if (existingUser) {
+          // 用户已存在，直接返回现有用户
+          return done(null, user);
+      }
+      // 创建新用户
+      const newUser = new User({
+          username: userInfo.preferred_username || userInfo.name || userInfo.email,
+          email: userInfo.email,
+          // 密码字段不设置
+          avatar: "/public/uploads/default-avatar.png",
+          game_stats: {
+              total_games_played: 0,
+              total_wins: 0,
+              total_losses: 0,
+              win_rate: 0,
+              average_game_time: 0,
+              rank: 'Newbie',
+          }
+      });
+
+      try {
+          const savedUser = await newUser.save();
+          done(null, user);
+      } catch (error) {
+          console.error("Error creating new user:", error);
+          done(error, null);
+      }
+    });
   }
   
 
@@ -120,6 +153,8 @@ Issuer.discover("https://coursework.cs.duke.edu/").then(issuer => {
 app.get('/login/oidc', passport.authenticate('oidc', {
   successReturnToOrRedirect: "/"
 }))
+
+
 app.get('/login-callback', passport.authenticate('oidc', {
   failureRedirect: '/login',
 }), (req, res) => {
@@ -136,6 +171,16 @@ app.get('/login-callback', passport.authenticate('oidc', {
 
 
 const authenticateJWT = (req: Request, res: Response, next:NextFunction) => {
+  
+  if (req.session && req.session.user) {
+    req.user = req.session.user;
+    console.log("username in middleware is:", req.user.username);
+    return next();
+}
+  
+  
+  
+  
   const authHeader = req.headers.authorization;
   // print out the entire request object
   console.log("Request object: ", req.headers);
@@ -166,12 +211,22 @@ const authenticateJWT = (req: Request, res: Response, next:NextFunction) => {
   }
 };
 
-app.get("/",(req, res) => {
+app.get("/",authenticateJWT,(req, res) => {
 
 
   res.send("Hello World")
 })
-app.get('/api/users/:username',authenticateJWT,(req, res) => (userController.getUserProfile(req, res)));
+//app.get('/api/users',authenticateJWT,(req, res) => (userController.getUserProfile(req, res)));
+app.get('/api/users', authenticateJWT, (req, res) => {
+  console.log("reached api/user end");
+  if (req.user) {
+    console.log("username in api:", req.user.username);
+      // 假设 userController.getUserProfile 方法已经正确实现并返回用户数据
+      userController.getUserProfile(req, res);
+  } else {
+      res.status(401).send("Unauthorized");
+  }
+});
 
 
 

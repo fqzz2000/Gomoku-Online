@@ -9,7 +9,7 @@
             <!-- Use v-for to list rooms here -->
             <b-list-group-item button v-for="room in rooms" :key="room.id" @click="enterRoom(room)">
               Room {{ room.number }} - Player: {{ room.players.join(', ') }}  [{{ room.status }}]
-              <b-button variant="danger" class="float-right" @click.stop="deleteRoom(room.id)">Delete</b-button>
+              <!--b-button variant="danger" class="float-right" @click.stop="deleteRoom(room.id)">Delete</b-button-->
             </b-list-group-item>
           </b-list-group>
         </b-card>
@@ -75,10 +75,10 @@ const rooms = ref<Room[]>([]);
 
   async function fetchUserInfo() {
     try {
-      const username = "xsasa";
+     //const username = "xsasa";
       
       console.log('User info is fetching');
-      const response = await getWithToken(`/api/users/${username}`, localStorage.getItem('token') as string);
+      const response = await getWithToken(`/api/users`, localStorage.getItem('token') as string);
 
       user.value = {
       avatar: response.data.avatar || '../assets/images.png', 
