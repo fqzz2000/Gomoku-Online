@@ -38,7 +38,8 @@ export default defineConfig({
         target: 'http://localhost:8131',
         changeOrigin: true,
        // rewrite: path => path.replace(/^\/login\/oidc/, '/login/oidc')
-      }
+      },
+     
     }
   },
   
