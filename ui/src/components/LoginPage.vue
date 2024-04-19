@@ -11,10 +11,12 @@
         <label for="password">Password:</label>
         <input v-model="password" type="password" id="password" required>
       </div>
-      <button type="submit">Login</button>
+      <button type="submit">Login with JWT</button>
+      <button type="button" @click="loginWithOIDC">Login with OIDC</button> <!-- 新增的 OIDC 登录按钮 -->
     </form>
   </div>
 </template>
+
 
 <script>
 import axios from 'axios';
@@ -45,6 +47,12 @@ export default {
         alert('Login failed: ' + error.message);
       }
     },
+    loginWithOIDC() {
+      // 重定向到后端的 OIDC 登录路由
+      window.location.href = '/login/oidc';
+      
+    }
+  
   },
 };
 </script>
