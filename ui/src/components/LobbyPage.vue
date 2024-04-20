@@ -9,7 +9,7 @@
             <!-- Use v-for to list rooms here -->
             <b-list-group-item button v-for="room in rooms" :key="room.id" @click="enterRoom(room)">
               Room {{ room.number }} - Player: {{ room.players.join(', ') }}  [{{ room.status }}]
-              <b-button variant="danger" class="float-right" @click.stop="deleteRoom(room.id)">Delete</b-button>
+              <!--b-button variant="danger" class="float-right" @click.stop="deleteRoom(room.id)">Delete</b-button-->
             </b-list-group-item>
           </b-list-group>
         </b-card>
