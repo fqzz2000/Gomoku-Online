@@ -19,18 +19,13 @@
 
       <!-- User Profile/Chat Section -->
       <b-col md="4">
-        <b-card no-body class="mb-1" header="The User">
-          <b-card-body class="text-center">
-            <b-avatar variant="info" size="4rem" class="mb-2" :src="user.avatar"></b-avatar>
-            <p>Name: {{ user.name }}</p>
-            <p>Games: {{ user.games }}</p>
-            <p>Win Rate: {{ user.winRate.toFixed(2) }}%</p>
-            <b-button variant="danger" @click="logout">Logout</b-button>
-          </b-card-body>
-        </b-card>
+        <ProfileBlock :user="user" :enable-edit="true" :enable-upload="false"/>
+        <b-button variant="danger" @click="logout">Logout</b-button>
+
         <b-card no-body header="More Profile or A chat room">
           <!-- Chat or profile content here -->
         </b-card>
+
       </b-col>
     </b-row>
   </b-container>
@@ -43,7 +38,7 @@
   import { toRaw } from 'vue';
   import { useRouter } from 'vue-router';
   import { getWithToken, postWithToken, deleteWithToken } from '../utils';
-
+  import ProfileBlock from './ProfileBlock.vue';
   const router = useRouter();
 
 
@@ -70,6 +65,7 @@ const rooms = ref<Room[]>([]);
     name: 'Alice',
     games: 10,
     winRate: 70,
+    email: "123@123.com"
   });
 
 
@@ -85,8 +81,8 @@ const rooms = ref<Room[]>([]);
       avatar: response.data.avatar || '../assets/images.png', 
       name: response.data.username, 
       games: response.data.game_stats.total_games_played,
-      winRate: response.data.game_stats.total_games_played === 0 ? 0 : (response.data.game_stats.total_wins / response.data.game_stats.total_games_played) * 100
-
+      winRate: response.data.game_stats.total_games_played === 0 ? 0 : (response.data.game_stats.total_wins / response.data.game_stats.total_games_played) * 100,
+      email: response.data.email
 
       }
       console.log('User info fetched:', response.data);
