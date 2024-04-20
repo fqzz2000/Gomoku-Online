@@ -21,6 +21,8 @@
     "vuex": "^4.0.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.43.1",
+    "@types/node": "^20.12.7",
     "@vitejs/plugin-vue": "^4.5.2",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
