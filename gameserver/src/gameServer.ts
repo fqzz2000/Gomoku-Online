@@ -18,7 +18,7 @@ export class GameServer {
   private static removePlayerFromRoom(roomId: string, playerName: string) {
     axios.post(`http://localhost:8131/api/rooms/players/remove`, { roomId:roomId,playerName: playerName })
     .then((res) => {
-      console.log(`statusCode: ${res.status}`);
+      console.log(`removing statusCode!!!!!!!!!!!: ${res.status}`);
       // console.log(res.data);
     }
     ).catch((error) => {
@@ -64,7 +64,7 @@ export class GameServer {
       console.log('Client connected:', socket.id);
       socket.on("getGameState", async (req) => {
         const { token, roomId } = req;
-        let username = await this.authService.verifyToken(token);
+        let username = await this.authService.verifySessionAndToken(token);
         if (username === false) {
           socket.emit('error', 'Authentication failed');
           return;
@@ -80,7 +80,8 @@ export class GameServer {
       });
       socket.on('joinRoom', async (req) => {
         const { token, roomId, userId, username } = req;
-        let usrname = await this.authService.verifyToken(token);
+        let usrname = await this.authService.verifySessionAndToken(token);
+
         if (usrname === false) {
           socket.emit('error', 'Authentication failed');
           return;
@@ -105,6 +106,7 @@ export class GameServer {
           console.log("current users in room", room.getUsers())
           
           this.io.to(roomId).emit('roomInfo', { roomId: roomId, users: room.getUsers() });
+       
           return;
         }
         console.log("add user", user , "to room", roomId)
@@ -112,6 +114,7 @@ export class GameServer {
           socket.emit('error', 'Room is full');
           return;
         }
+        console.log("add user in room test",  room.getUsers())
 
 
         // socket.emit('roomInfo', { roomId, users: room.getUsers() });
@@ -121,7 +124,7 @@ export class GameServer {
       socket.on("leaveRoom", async (req) => {
         const { token, roomId, userId } = req;
         console.log('User left room:', roomId);
-        let usrname = await this.authService.verifyToken(token);
+        let usrname = await this.authService.verifySessionAndToken(token);
         if (usrname === false) {
           socket.emit('error', 'Authentication failed');
           return;
@@ -133,6 +136,7 @@ export class GameServer {
           return;
         }
         socket.leave(roomId);
+        console.log('User left room:', roomId,"and removed this player:",usrname);
         room.removeUser(usrname);
         this.io.to(roomId).emit('roomInfo', { roomId: roomId, users: room.getUsers() });
         GameServer.removePlayerFromRoom(roomId, usrname);
@@ -140,7 +144,7 @@ export class GameServer {
 
       socket.on("startGame", async (req) => {
         const { token, roomId } = req;
-        let usr = await this.authService.verifyToken(token);
+        let usr = await this.authService.verifySessionAndToken(token);
         if (usr === false) {
           socket.emit('error', 'Authentication failed');
           return;
@@ -165,7 +169,7 @@ export class GameServer {
 
       socket.on("makeMove", async (req) => {
         const { token, roomId, x, y, userId } = req;
-        let usrname = await this.authService.verifyToken(token);
+        let usrname = await this.authService.verifySessionAndToken(token);
         if (usrname === false) {
           socket.emit('error', 'Authentication failed');
           return;

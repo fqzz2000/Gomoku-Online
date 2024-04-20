@@ -26,10 +26,15 @@ const routes = [
             const token = to.query.token as string | undefined;
             if (token) {
               localStorage.setItem('token', token);
-              // 删除 token 参数后继续导航
+          
+              console.log("token is:",token);
               delete to.query.token;
               next({ ...to, replace: true });
             } else {
+
+              console.log("no token");
+              const token2=localStorage.getItem('token') ;
+              console.log("stored token is:",token2);
               next();
             }
           }

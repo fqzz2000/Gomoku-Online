@@ -20,6 +20,8 @@
       <!-- User Profile/Chat Section -->
       <b-col md="4">
         <ProfileBlock :user="user" :enable-edit="true" :enable-upload="false"/>
+        <b-button variant="danger" @click="logout">Logout</b-button>
+
         <b-card no-body header="More Profile or A chat room">
           <!-- Chat or profile content here -->
         </b-card>
@@ -43,7 +45,7 @@
 
   onMounted(() => {
   //const username = localStorage.getItem('username'); 
-  // const username=req.user.username;
+  //const username=req.user.username;
   fetchRooms();
   fetchUserInfo(); 
   });
@@ -70,11 +72,10 @@ const rooms = ref<Room[]>([]);
 
   async function fetchUserInfo() {
     try {
-      //const username = "xsasa";
+     const username = "xsasa";
       
       console.log('User info is fetching');
       const response = await getWithToken(`/api/users/${username}`, localStorage.getItem('token') as string);
-
 
       user.value = {
       avatar: response.data.avatar || '../assets/images.png', 
@@ -121,30 +122,48 @@ const addRoom = async () => {
     }, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
-    // const response = await axios.post('/api/rooms', { number: newNumber.toString(), player: user.value.name},  {headers: {
-  //   Authorization: `Bearer ${localStorage.getItem('token')}`
-  // }});
 
-        const newRoom = response.data;
+    const newRoom = response.data;
     rooms.value.push(newRoom);
     enterRoom(newRoom);  // Redirect to the new room immediately
-
-fetchRooms();
+    fetchRooms();
   } catch (error) {
-    console.error(error);
+    if (axios.isAxiosError(error)) {
+      // 检查HTTP状态码
+      if (error.response && error.response.status === 403) {
+        alert('You do not have permission to perform this action.');  // 显示警告消息
+      } else {
+        console.error('Failed to add room:', error.response?.data || 'An unknown error occurred');
+      }
+    } else {
+      console.error('An unexpected error occurred:', error);
+    }
   }
 };
 
-const deleteRoom = async (roomId:string) => {
+
+const deleteRoom = async (roomId: string) => {
   try {
     console.log("Attempting to delete room with ID:", roomId);
-    await deleteWithToken(`/api/rooms/${roomId}`, localStorage.getItem('token') as string);
+    await axios.delete(`/api/rooms/${roomId}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
 
-    fetchRooms(); // 重新获取房间列表以更新UI
+    fetchRooms(); 
   } catch (error) {
-    console.error(error);
+    if (axios.isAxiosError(error)) {
+    
+      if (error.response && error.response.status === 403) {
+        alert('You do not have permission to delete this room.');  
+      } else {
+        console.error('Failed to delete room:', error.response?.data || 'An unknown error occurred');
+      }
+    } else {
+      console.error('An unexpected error occurred:', error);
+    }
   }
 };
+
 const enterRoom = async (room: Room) => {
   try {
     if (room.status === 'waiting') {
@@ -178,8 +197,18 @@ const enterRoom = async (room: Room) => {
 
   }
 }
-};
 
+};
+const logout = async () => {
+  try {
+    await axios.post('/api/logout'); 
+    localStorage.removeItem('token'); 
+    router.push('/login'); 
+  } catch (error) {
+    console.error('Logout failed:', error);
+    alert('Logout failed, please try again.');
+  }
+};
 
   </script>
 

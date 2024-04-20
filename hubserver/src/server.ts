@@ -8,6 +8,8 @@ import mongoose from 'mongoose'
 import { UserController,registerUser, loginUser } from './controllers/UserController';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import Room from './models/RoomModel';
+import { verify ,authenticateJWT,checkGroupAccess } from './controllers/AuthController';
+
 import multer from 'multer';
 
 import {createRoom,deleteRoomById,getRoomById,getRooms, RoomController,addPlayerToRoom ,removePlayerFromRoom} from './controllers/RoomController';
@@ -21,6 +23,12 @@ import { Issuer, Strategy, generators } from 'openid-client';
 import passport from 'passport';
 import session from 'express-session';
 import { gitlab } from "./secrets"
+import jwksClient from 'jwks-rsa';
+import { JwtHeader } from 'jsonwebtoken';
+//import { SigningKeyCallback } from 'jwks-rsa';
+//import { Key } from 'jwks-rsa';
+import MongoStore from 'connect-mongo';
+
 const url = 'mongodb://127.0.0.1:27017'
 
 // set up Express
@@ -65,11 +73,7 @@ app.use(session({
   //   ttl: 14 * 24 * 60 * 60 // 14 days
   // })
 }))
-declare module 'express-session' {
-  export interface SessionData {
-    credits?: number
-  }
-}
+
 
 app.use(passport.initialize())
 app.use(passport.session())
@@ -92,25 +96,7 @@ Issuer.discover("https://coursework.cs.duke.edu/").then(issuer => {
     redirect_uri: 'http://localhost:8131/login-callback',
     state: generators.state(),
   }
-
-  function verify(tokenSet: any, userInfo: any, done: (error: any, user: any) => void) {
-
-      console.log('tokenSet:', tokenSet);
-      console.log('userInfo:', userInfo);
   
-      // 假设你想把 access_token 和 id_token 存储起来
-      const user = {
-        id: userInfo.sub, // OIDC "sub" (subject) 通常是用户的唯一标识符
-        username: userInfo.preferred_username || userInfo.name,
-        email: userInfo.email,
-        accessToken: tokenSet.access_token,
-        idToken: tokenSet.id_token
-    };
-  
-      return done(null, user); // 现在 enrichedUser 包括了令牌信息
-  }
-  
-
   passport.use('oidc', new Strategy({ client, params }, verify))
 
   // app.listen(port, () => {
@@ -121,58 +107,43 @@ Issuer.discover("https://coursework.cs.duke.edu/").then(issuer => {
 app.get('/login/oidc', passport.authenticate('oidc', {
   successReturnToOrRedirect: "/"
 }))
-app.get('/login-callback', passport.authenticate('oidc', {
-  failureRedirect: '/login',
-}), (req, res) => {
-  // 检查 user 对象是否包括令牌信息
 
-  if (req.user && req.user.accessToken) {
-    // 注意安全风险，仅在安全的环境下这样做
+
+app.get('/login-callback', passport.authenticate('oidc', {
+  failureRedirect: 'http://localhost:5173/login',
+}), (req, res) => {
+
+
+  if (req.user && req.user.idToken) {
+
     req.session.user = req.user; 
-    res.redirect(`http://localhost:5173/?token=${req.user.accessToken}`);
+    res.redirect(`http://localhost:5173/?token=${req.user.idToken}`);
   } else {
-    res.redirect('/login?error=token_missing');
+    res.redirect('http://localhost:5173/login?error=token_missing');
   }
 });
 
+//const jwksClient = require('jwks-rsa');
 
-const authenticateJWT = (req: Request, res: Response, next:NextFunction) => {
-  const authHeader = req.headers.authorization;
-  // print out the entire request object
-  console.log("Request object: ", req.headers);
-  if (authHeader) {
-    const token = authHeader.split(' ')[1];
 
-    jwt.verify(token, secretKey, (err, decoded) => {
-      if (err) {
 
-        console.error("Error verifying JWT:", err);
-        return res.sendStatus(403);
 
-      }
-
-      if (typeof decoded === 'object' && decoded !== null && 'username' in decoded) {
-        // Assuming that decoded object is of type IUser or has at least a 'username' property.
-        req.user = decoded as IUser;
-        next();
-      } else {
-        return res.sendStatus(401); // Unauthorized
-      }
-    });
-  } else {
-
-    console.log("No token")
-    res.sendStatus(401);
-
-  }
-};
-
-app.get("/",(req, res) => {
+app.get("/",authenticateJWT,(req, res) => {
 
 
   res.send("Hello World")
 })
-app.get('/api/users/:username',authenticateJWT,(req, res) => (userController.getUserProfile(req, res)));
+//app.get('/api/users',authenticateJWT,(req, res) => (userController.getUserProfile(req, res)));
+app.get('/api/users/:username', authenticateJWT, (req, res) => {
+  console.log("reached api/user end");
+  if (req.user) {
+    console.log("username in api:", req.user.username);
+     
+      userController.getUserProfile(req, res);
+  } else {
+      res.status(401).send("Unauthorized");
+  }
+});
 
 
 
@@ -202,12 +173,15 @@ app.post('/api/login', async (req: Request, res: Response) => {
   }
 });
 
-//app.post('/api/login', loginUser);
-app.post('/api/rooms',authenticateJWT, createRoom);
+
+
+
+app.post('/api/rooms',authenticateJWT,checkGroupAccess('users-able-to-create-room'), createRoom);
 app.get('/api/rooms',authenticateJWT, getRooms);
-app.delete('/api/rooms/:id', authenticateJWT,deleteRoomById);
+app.delete('/api/rooms/:id', authenticateJWT,checkGroupAccess('users-able-to-create-room'),deleteRoomById);
 app.get('/api/rooms/:roomId',authenticateJWT, getRoomById);
 app.post('/api/authentication',authenticateJWT, (req, res) => {
+  console.log("reached authentication ");
   return res.status(200).json(req.user);
 });
 
@@ -230,6 +204,15 @@ app.post('/api/rooms/:roomId/players/add', addPlayerToRoom);
 
 
 app.post('/api/rooms/players/remove', removePlayerFromRoom);
+app.post('/api/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return console.error('Session destruction error:', err);
+    }
+    res.clearCookie('connect.sid'); // 'connect.sid' 是默认的会话 cookie 名称，根据配置可能不同
+    res.redirect('http://localhost:5173/login'); 
+  });
+});
 
 
 
@@ -259,4 +242,3 @@ mongoose.connect(url).then(() => {
     app.listen(port, ()=> {
         logger.info(`Server running on port ${port}`)
     })})
-
