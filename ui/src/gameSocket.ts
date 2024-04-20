@@ -59,6 +59,7 @@ export class GameSocket {
      */
 
     public leaveRoom(roomId: string, userId : string): void {
+        console.log("in game server this userId:",userId,"is leaving room:",roomId);
         this.socket.emit('leaveRoom', {token:this.token,roomId: roomId, userId : userId});
     }
 

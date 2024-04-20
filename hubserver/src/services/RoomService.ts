@@ -1,3 +1,4 @@
+import { log } from 'console';
 import  Room, { IRoom } from '../models/RoomModel';
 //import mongoose from 'mongoose';
 export class RoomService {
@@ -32,6 +33,7 @@ export class RoomService {
 
     public async removePlayerFromRoom(roomId: string, playerName: string): Promise<IRoom | null> {
         try {
+            console.log("remove player:",playerName,"from:", roomId)
             const room = await Room.findByIdAndUpdate(
                 roomId, 
                 { $pull: { players: playerName } },
