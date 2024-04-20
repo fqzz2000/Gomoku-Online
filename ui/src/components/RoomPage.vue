@@ -84,13 +84,14 @@ const gameSocket = new GameSocket('http://localhost:8181', localStorage.getItem(
 onMounted(async () => {
 
   userName.value = username;
-
+console.log("username in room is :",userName.value);
    
   gameSocket.connect(localStorage.getItem('token') as string);
   gameSocket.onRoomInfo(async (roomInfo) => {
     // alert('Room Info: ' + JSON.stringify(roomInfo));
-
+    console.log("room info for this room is:", roomInfo);
   user1.value.name = roomInfo.users[0].username;
+  console.log("user1 in room is :", user1.value.name);
   let ret = await Data.fetchUserProfile(roomInfo.users[0].username, localStorage.getItem('token') as string);
   user1.value.games = ret.totalGame;
   user1.value.winRate = ret.winRate;
@@ -128,7 +129,7 @@ if (userName.value !== null)
 
 function leaveRoom() {
   gameSocket.leaveRoom(roomId, userName.value);
-  console.log('Leaving room:', roomId);
+  console.log("this player:",userName.value,'is leaving room:', roomId);
   router.push('/');
   gameSocket.disconnect();
 }

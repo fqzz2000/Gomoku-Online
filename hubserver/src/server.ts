@@ -24,6 +24,8 @@ import jwksClient from 'jwks-rsa';
 import { JwtHeader } from 'jsonwebtoken';
 //import { SigningKeyCallback } from 'jwks-rsa';
 //import { Key } from 'jwks-rsa';
+import MongoStore from 'connect-mongo';
+
 const url = 'mongodb://127.0.0.1:27017'
 
 // set up Express
@@ -68,11 +70,7 @@ app.use(session({
   //   ttl: 14 * 24 * 60 * 60 // 14 days
   // })
 }))
-declare module 'express-session' {
-  export interface SessionData {
-    credits?: number
-  }
-}
+
 
 app.use(passport.initialize())
 app.use(passport.session())
@@ -112,7 +110,7 @@ Issuer.discover("https://coursework.cs.duke.edu/").then(issuer => {
     
   
      // return done(null, user); // 现在 enrichedUser 包括了令牌信息
-     User.findOne({ email: userInfo.email }, async (err:Error | null, existingUser:IUser) => {
+     User.findOne({ username: userInfo.preferred_username || userInfo.name}, async (err:Error | null, existingUser:IUser) => {
       if (err) {
         return done(err, null);
       }
@@ -122,7 +120,7 @@ Issuer.discover("https://coursework.cs.duke.edu/").then(issuer => {
       }
       // 创建新用户
       const newUser = new User({
-          username: userInfo.preferred_username || userInfo.name || userInfo.email,
+          username: userInfo.preferred_username || userInfo.name,
           email: userInfo.email,
           // 密码字段不设置
           avatar: "/public/uploads/default-avatar.png",
@@ -160,7 +158,7 @@ app.get('/login/oidc', passport.authenticate('oidc', {
 
 
 app.get('/login-callback', passport.authenticate('oidc', {
-  failureRedirect: '/login',
+  failureRedirect: 'http://localhost:5173/login',
 }), (req, res) => {
 
 
@@ -169,7 +167,7 @@ app.get('/login-callback', passport.authenticate('oidc', {
     req.session.user = req.user; 
     res.redirect(`http://localhost:5173/?token=${req.user.idToken}`);
   } else {
-    res.redirect('/login?error=token_missing');
+    res.redirect('http://localhost:5173/login?error=token_missing');
   }
 });
 
@@ -177,7 +175,7 @@ app.get('/login-callback', passport.authenticate('oidc', {
 
 // 创建 JWKS 客户端
 const client = jwksClient({
-  jwksUri: 'https://coursework.cs.duke.edu/.well-known/jwks.json'
+  jwksUri: 'https://coursework.cs.duke.edu/oauth/discovery/keys'
 });
 interface MyHeader extends JwtHeader {
   kid?: string;
@@ -187,6 +185,7 @@ function getKey(header: MyHeader, callback: (err: Error | null, key?: string) =>
   if (header.alg === 'RS256') {
     client.getSigningKey(header.kid, (err, key) => {
       if (err) {
+        console.log("did not find the key!");
         callback(err, undefined);
         return;
       }
@@ -202,6 +201,7 @@ function getKey(header: MyHeader, callback: (err: Error | null, key?: string) =>
   } else {
     // 对于非 RS256 算法，使用本地密钥
     callback(null, secretKey);
+    console.log("this is the secret key:",secretKey);
   }
 }
 
@@ -263,8 +263,9 @@ if (authHeader) {
         }
   
       
-        req.user = decoded as IUser;
-        console.log("Token is valid. User:", req.user.name);
+        req.user = decoded;
+        console.log("Token is valid. Userinfo:", req.user);
+        console.log("Token is valid. User:", req.user.preferred_username);
         next();
       });
     } else {
@@ -305,11 +306,11 @@ app.get("/",authenticateJWT,(req, res) => {
   res.send("Hello World")
 })
 //app.get('/api/users',authenticateJWT,(req, res) => (userController.getUserProfile(req, res)));
-app.get('/api/users', authenticateJWT, (req, res) => {
+app.get('/api/users/:username', authenticateJWT, (req, res) => {
   console.log("reached api/user end");
   if (req.user) {
     console.log("username in api:", req.user.username);
-      // 假设 userController.getUserProfile 方法已经正确实现并返回用户数据
+     
       userController.getUserProfile(req, res);
   } else {
       res.status(401).send("Unauthorized");
@@ -369,6 +370,15 @@ app.post('/api/rooms/:roomId/players/add', addPlayerToRoom);
 
 
 app.post('/api/rooms/players/remove', removePlayerFromRoom);
+app.post('/api/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return console.error('Session destruction error:', err);
+    }
+    res.clearCookie('connect.sid'); // 'connect.sid' 是默认的会话 cookie 名称，根据配置可能不同
+    res.redirect('http://localhost:5173/login'); 
+  });
+});
 
 
 // static files
@@ -379,4 +389,3 @@ mongoose.connect(url).then(() => {
     app.listen(port, ()=> {
         logger.info(`Server running on port ${port}`)
     })})
-

@@ -25,7 +25,7 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:8131', // 后端服务器地址
+        target: 'http://localhost:8131', 
         changeOrigin: true,
         // rewrite: (path) => path.replace(/^\/api/, '')
       },
@@ -38,6 +38,11 @@ export default defineConfig({
         target: 'http://localhost:8131',
         changeOrigin: true,
        // rewrite: path => path.replace(/^\/login\/oidc/, '/login/oidc')
+      },
+      '/game': {
+        target: 'http://localhost:8181', 
+        changeOrigin: true,
+        ws: true, 
       },
      
     }

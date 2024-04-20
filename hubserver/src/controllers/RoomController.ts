@@ -119,7 +119,9 @@ export const addPlayerToRoom = async (req: Request, res: Response) => {
 
 export const removePlayerFromRoom = async (req: Request, res: Response) => {
     const { roomId, playerName } = req.body;
+    console.log("removinf start.");
     try {
+      console.log("removinf start.");
         const room = await roomService.removePlayerFromRoom(roomId, playerName);
         if (room) {
             res.status(200).json(room);

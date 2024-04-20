@@ -9,7 +9,7 @@
             <!-- Use v-for to list rooms here -->
             <b-list-group-item button v-for="room in rooms" :key="room.id" @click="enterRoom(room)">
               Room {{ room.number }} - Player: {{ room.players.join(', ') }}  [{{ room.status }}]
-              <!--b-button variant="danger" class="float-right" @click.stop="deleteRoom(room.id)">Delete</b-button-->
+              <b-button variant="danger" class="float-right" @click.stop="deleteRoom(room.id)">Delete</b-button>
             </b-list-group-item>
           </b-list-group>
         </b-card>
@@ -25,6 +25,7 @@
             <p>Name: {{ user.name }}</p>
             <p>Games: {{ user.games }}</p>
             <p>Win Rate: {{ user.winRate.toFixed(2) }}%</p>
+            <b-button variant="danger" @click="logout">Logout</b-button>
           </b-card-body>
         </b-card>
         <b-card no-body header="More Profile or A chat room">
@@ -75,10 +76,10 @@ const rooms = ref<Room[]>([]);
 
   async function fetchUserInfo() {
     try {
-    // const username = "xsasa";
+     const username = "xsasa";
       
       console.log('User info is fetching');
-      const response = await getWithToken(`/api/users`, localStorage.getItem('token') as string);
+      const response = await getWithToken(`/api/users/${username}`, localStorage.getItem('token') as string);
 
       user.value = {
       avatar: response.data.avatar || '../assets/images.png', 
@@ -182,8 +183,18 @@ const enterRoom = async (room: Room) => {
 
   }
 }
-};
 
+};
+const logout = async () => {
+  try {
+    await axios.post('/api/logout'); 
+    localStorage.removeItem('token'); 
+    router.push('/login'); 
+  } catch (error) {
+    console.error('Logout failed:', error);
+    alert('Logout failed, please try again.');
+  }
+};
 
   </script>
 

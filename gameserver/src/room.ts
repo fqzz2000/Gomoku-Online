@@ -24,7 +24,9 @@ export class Room {
     }
   
     removeUser(userId: string): void {
+console.log('remove:',userId);
       this.users = this.users.filter(user => user.id !== userId);
+
     }
   
     getUserCount(): number {
