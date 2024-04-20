@@ -72,7 +72,6 @@ const rooms = ref<Room[]>([]);
 
   async function fetchUserInfo() {
     try {
-
      const username = "xsasa";
       
       console.log('User info is fetching');

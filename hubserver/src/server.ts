@@ -27,7 +27,6 @@ import jwksClient from 'jwks-rsa';
 import { JwtHeader } from 'jsonwebtoken';
 //import { SigningKeyCallback } from 'jwks-rsa';
 //import { Key } from 'jwks-rsa';
-
 import MongoStore from 'connect-mongo';
 
 const url = 'mongodb://127.0.0.1:27017'
@@ -98,7 +97,6 @@ Issuer.discover("https://coursework.cs.duke.edu/").then(issuer => {
     state: generators.state(),
   }
   
-
   passport.use('oidc', new Strategy({ client, params }, verify))
 
   // app.listen(port, () => {
@@ -109,7 +107,6 @@ Issuer.discover("https://coursework.cs.duke.edu/").then(issuer => {
 app.get('/login/oidc', passport.authenticate('oidc', {
   successReturnToOrRedirect: "/"
 }))
-
 
 
 app.get('/login-callback', passport.authenticate('oidc', {
@@ -127,6 +124,7 @@ app.get('/login-callback', passport.authenticate('oidc', {
 });
 
 //const jwksClient = require('jwks-rsa');
+
 
 
 
