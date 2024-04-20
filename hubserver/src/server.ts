@@ -98,6 +98,7 @@ Issuer.discover("https://coursework.cs.duke.edu/").then(issuer => {
 
       console.log('tokenSet:', tokenSet);
       console.log('userInfo:', userInfo);
+      console.log('Groups:', userInfo.groups);
   
       // 假设你想把 access_token 和 id_token 存储起来
       const user = {
@@ -105,7 +106,8 @@ Issuer.discover("https://coursework.cs.duke.edu/").then(issuer => {
         username: userInfo.preferred_username || userInfo.name,
         email: userInfo.email,
         accessToken: tokenSet.access_token,
-        idToken: tokenSet.id_token
+        idToken: tokenSet.id_token,
+        groups:userInfo.groups
     };
     
   
@@ -346,9 +348,25 @@ app.post('/api/login', async (req: Request, res: Response) => {
 });
 
 //app.post('/api/login', loginUser);
-app.post('/api/rooms',authenticateJWT, createRoom);
+function checkGroupAccess(requiredGroup: string) {
+  return function(req: Request, res: Response, next: NextFunction) {
+    console.log("user in group middleware is:",req.user);
+    console.log("group is:",req.user.groups);
+      if (req.user && req.user.groups && req.user.groups.includes(requiredGroup)) {
+          
+        next();  
+      } else {
+          res.status(403).send('Access Denied'); 
+
+      }
+  };
+}
+
+
+
+app.post('/api/rooms',authenticateJWT,checkGroupAccess('users-able-to-create-room'), createRoom);
 app.get('/api/rooms',authenticateJWT, getRooms);
-app.delete('/api/rooms/:id', authenticateJWT,deleteRoomById);
+app.delete('/api/rooms/:id', authenticateJWT,checkGroupAccess('users-able-to-create-room'),deleteRoomById);
 app.get('/api/rooms/:roomId',authenticateJWT, getRoomById);
 app.post('/api/authentication',authenticateJWT, (req, res) => {
   console.log("reached authentication ");
