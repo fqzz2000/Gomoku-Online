@@ -1,10 +1,10 @@
 <template>
-  <b-container fluid>
+  <b-container fluid lobby>
     <!-- Row for the room list and the user profile/chat section -->
     <b-row>
       <!-- Room List Section -->
       <b-col md="8" class="room-list-section">
-        <b-card no-body class="mb-1" header="Room List">
+        <b-card no-body class="mb-1 semi-transparent" header="Room List">
           <b-list-group flush>
             <!-- Use v-for to list rooms here -->
             <b-list-group-item button v-for="room in rooms" :key="room.id" @click="enterRoom(room)">
@@ -23,11 +23,15 @@
 
 
 
+
+
+
         <b-card no-body header="LeaderBoard">
          
         <RankBlock />
         </b-card>
-        <b-button variant="danger" @click="logout" class="mb-3 mt-3">Logout</b-button>
+         <b-button variant="danger" @click="logout">Logout</b-button>
+        <b-button variant="primary" @click="goToLogin">Login</b-button>
 
       </b-col>
     </b-row>
@@ -145,7 +149,9 @@ const addRoom = async () => {
     }
   }
 };
-
+function goToLogin() {
+  router.push('/login');  // 确保这里的路径与你的路由配置匹配
+}
 
 const deleteRoom = async (roomId: string) => {
   try {
@@ -219,13 +225,28 @@ const logout = async () => {
 
 <style scoped>
 /* 为了确保整体一致性，我们延续使用Poppins字体，确保在你的项目中已经引入 */
-body {
-  font-family: 'Poppins', sans-serif;
+.lobby * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif; /* 使用Poppins字体 */
+}
+.lobby body {
+  background-image: url('../assets/loginpage.png'); /* 确保图片路径正确 */
+  background-size: cover; /* 覆盖整个可视区域 */
+  background-position: center; /* 图片居中显示 */
+  background-repeat: no-repeat; /* 不重复图片 */
+  background-attachment: fixed; /* 背景图片固定，不随页面滚动 */
 }
 
 .room-list-section .b-card,
-.b-card.no-body {
-  background-color: #D78B9B; /* 使用之前定义的深粉色 */
+.b-card.no-body,
+.login-form {
+  background-color: rgba(255, 255, 255, 0.5); /* 透明度设置为0.5，表示50%透明 */
+}
+
+.register-container {
+  background-color: rgba(255, 255, 255, 0.5); /* 调整alpha值到0.5实现半透明效果 */
   color: white; /* 保持文本为白色以确保可读性 */
   border-radius: 8px; /* 添加圆角以保持风格一致 */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 添加轻微阴影以提升层次感 */
@@ -237,13 +258,13 @@ body {
 
 /* 调整列表项的样式 */
 .b-list-group-item {
-  background-color: #E9D6DF; /* 设置列表项背景为较浅的粉色 */
+  background-color: rgba(233, 214, 223, 0.5); /* 调整背景色和透明度 */
   color: #5A3A4A; /* 设置文字颜色以提高对比度 */
   border: none; /* 移除边框 */
 }
 
 .b-list-group-item:hover {
-  background-color: #D3BCC0; /* 鼠标悬停时的背景色 */
+  background-color: rgba(211, 188, 192, 0.7); /* 鼠标悬停时的背景色，略增加透明度 */
 }
 
 /* 文本和标题的边框效果 */
@@ -252,8 +273,9 @@ body {
 }
 
 /* 调整按钮样式 */
+
 button {
-  background-color: #729FCF; /* 设置按钮背景色为蓝色 */
+  background-color: rgb(8 37 69 / 70%); /* 设置按钮背景色为蓝色，并加上透明度 */
   color: white;
   border: none;
   border-radius: 4px;
@@ -263,6 +285,11 @@ button {
 }
 
 button:hover {
-  background-color: #567BAE; /* 鼠标悬停时按钮的背景色 */
+  background-color: rgba(86, 122, 174, 0.9); /* 鼠标悬停时按钮的背景色，减少透明度使按钮更显眼 */
 }
+/* 组件的 <style scoped> 标签内或全局样式文件中 */
+.semi-transparent {
+  background-color: rgba(255, 255, 255, 0.5); /* 设置半透明的白色背景 */
+}
+
 </style>

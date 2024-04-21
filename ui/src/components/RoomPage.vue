@@ -1,4 +1,5 @@
 <template>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <b-container fluid class="vh-100">
       <!-- Outer Row for User/Empty section and Profile/Chat -->
       <b-row class="h-100">

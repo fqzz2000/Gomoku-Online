@@ -31,17 +31,19 @@
           </b-form>
           <b-button @click="backToLobby">Return</b-button>
         </div>
+
       </div>
     </div>
-
+  </div>
 </template>
 
 <script setup lang="ts">
-    import { computed, onMounted, ref } from 'vue';
-    import ProfileBlock from './ProfileBlock.vue';
-    import { postWithToken } from '../utils';
+import { computed, onMounted, ref } from 'vue';
+import ProfileBlock from './ProfileBlock.vue';
+import { postWithToken } from '../utils';
 import { Data } from '../data';
 import { useRouter } from 'vue-router';
+
 const router = useRouter();
     const confirmedPassword = ref('');
     const user = ref({
@@ -66,46 +68,147 @@ const router = useRouter();
       user.value = {
         avatar: ret.avatar || '../assets/images.png', 
         name: ret.username, 
+
         games: ret.totalGame,
         winRate: ret.winRate,
         email: ret.email
-      }
-    });
+    }
+});
 
-    async function updateProfile() {
-      const res = await postWithToken('/api/users/updateProfile', form.value, localStorage.getItem('token') as string)
-      if ( res === null) {
+async function updateProfile() {
+    const res = await postWithToken('/api/users/updateProfile', form.value, localStorage.getItem('token') as string);
+    if (res === null) {
         alert('Update failed');
-      } else if (res.status === 200) {
+    } else if (res.status === 200) {
         alert('Update successfully');
-      } 
-      const ret = await Data.fetchUserProfile("321", localStorage.getItem('token') as string);
-      user.value = {
-        avatar: ret.avatar || '../assets/images.png', 
-        name: ret.username, 
-        games: ret.totalGame,
-        winRate: ret.winRate,
-        email: ret.email
-      }
+        const ret = await Data.fetchUserProfile("321", localStorage.getItem('token') as string);
+        user.value = {
+            avatar: ret.avatar || '../assets/images.png',
+            name: ret.username,
+            games: ret.totalGame,
+            winRate: ret.winRate,
+            email: ret.email
+        }
     }
+}
 
-    function handleAvatarUpdated(avatar: string) {
-      user.value.avatar = avatar;
-      form.value.avatar = avatar;
-      console.log('Avatar updated:', avatar);
-    }
+function handleAvatarUpdated(avatar: string) {
+    user.value.avatar = avatar;
+    form.value.avatar = avatar;
+    console.log('Avatar updated:', avatar);
+}
 
-    function backToLobby() {
-      router.push('/');
-    }
+function backToLobby() {
+    router.push('/');
+}
 </script>
+<style scoped>
+.update-info-container .container {
+  background-color: rgba(255, 255, 255, 0.65); /* 设置背景色为白色，透明度为65% */
+  padding: 20px; /* 添加一些内边距 */
+  border-radius: 8px; /* 可选的圆角 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 可选的轻微阴影增加深度感 */
+}
 
-<style>
-  .is-invalid {
-    border-color: red;
-  }
-  .invalid-feedback {
-  color: red;
+.update-info-container .b-form {
+  background-color: rgba(14, 30, 45, 0.5); /* 为表单设置透明度更低的背景以突出表单区域 */
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.update-info-container .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.update-info-container input[type="text"], 
+.update-info-container input[type="password"], 
+.update-info-container input[type="email"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc; /* 轻微的边框强调输入框 */
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.5); /* 输入框也采用轻微透明效果 */
+  color: #ffffff;
+}
+
+.update-info-container button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #6586a973; /* 按钮颜色 */
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.update-info-container button:hover {
+  background-color: #004494; /* 鼠标悬浮时的按钮背景色变化 */
+}
+
+.update-info-container .is-invalid {
+  border-color: red; /* 无效输入的边框颜色 */
+}
+
+.update-info-container .invalid-feedback {
+  color: red; /* 错误信息的文字颜色 */
   font-size: 0.875em;
 }
+</style>
+<style scoped>
+.update-info-container .container {
+  background-color: rgba(255, 255, 255, 0.65); /* 设置背景色为白色，透明度为65% */
+  padding: 20px; /* 添加一些内边距 */
+  border-radius: 8px; /* 可选的圆角 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 可选的轻微阴影增加深度感 */
+}
+
+.update-info-container .b-form {
+  background-color: rgba(14, 30, 45, 0.5); /* 为表单设置透明度更低的背景以突出表单区域 */
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.update-info-container .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.update-info-container input[type="text"], 
+.update-info-container input[type="password"], 
+.update-info-container input[type="email"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc; /* 轻微的边框强调输入框 */
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.5); /* 输入框也采用轻微透明效果 */
+  color: #ffffff;
+}
+
+.update-info-container button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #6586a973; /* 按钮颜色 */
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.update-info-container button:hover {
+  background-color: #004494; /* 鼠标悬浮时的按钮背景色变化 */
+}
+.update-info-page {   background-color: rgba(255, 255, 255, 0.65); }
+.update-info-container .is-invalid {
+  border-color: red; /* 无效输入的边框颜色 */
+}
+.update-info-container .b-form-group label {
+  color: #333333; /* 这样只会影响拥有 unique-login-form 类的表单内的label */
+}
+.update-info-container .invalid-feedback {
+  color: red; /* 错误信息的文字颜色 */
+  font-size: 0.875em;
+}
+
+.update-info-page h2, .update-info-page label, .update-info-page input, .update-info-page button {   color: #333; /* 深灰色 */ }
 </style>
