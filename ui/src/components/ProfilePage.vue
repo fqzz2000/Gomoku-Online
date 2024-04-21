@@ -1,32 +1,37 @@
 <template>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-  <div class="container update-info-page">
-    <div class="row">
-      <div class="col-md-6">
-        <h2>Profile</h2>
-        <ProfileBlock :user="user" :enableEdit="false" :enableUpload="true" @avatar-updated="handleAvatarUpdated"/>
-      </div>
-      <div class="col-md-6">
-        <h2>Update Info</h2>
-        <b-form @submit.prevent="updateProfile">
-          <b-form-group label="Input Old Password: " label-for="input-old-password">
-            <b-form-input id="input-old-password" type="password" v-model="form.password" required placeholder="Please input your password"></b-form-input>
-          </b-form-group>
-          <b-form-group label="Input New Password:" label-for="input-password">
-            <b-form-input id="input-password" type="password" v-model="form.newPassword" required placeholder="Please input your password"></b-form-input>
-          </b-form-group>
-          <b-form-group label="Verify New Password:" label-for="input-confirm-password">
-            <b-form-input id="input-confirm-password" type="password" v-model="confirmedPassword" :class="{'is-invalid': !passwordMatch}" required placeholder="Please input your password"></b-form-input>
-          </b-form-group>
-          <div v-if="!passwordMatch" class="invalid-feedback" style="display: block;">
-            Password inconsistent
-          </div>
-          <b-form-group label="Update Email:" label-for="input-email">
-            <b-form-input id="input-email" type="email" v-model="form.email" required placeholder="Please input your email"></b-form-input>
-          </b-form-group>
-          <b-button type="submit" variant="primary">Submit</b-button>
-        </b-form>
-        <b-button @click="backToLobby">Return</b-button>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h2>Profile</h2>
+          <ProfileBlock :user="user" :enableEdit="false" :enableUpload="true" @avatar-updated="handleAvatarUpdated"/>
+        </div>
+        <div class="col-md-6">
+          <h2>Update Info</h2>
+          <b-form @submit.prevent="updateProfile">
+            <b-form-group label = "Input Old Password: " label-for="input-old-password">
+              <b-form-input id="input-old-password" type="password" v-model="form.password"  placeholder="Please input your password"></b-form-input>
+            </b-form-group>
+            <b-form-group label="Input New Password:" label-for="input-password">
+              <b-form-input id="input-password" type="password" v-model="form.newPassword"  placeholder="Please input your password"></b-form-input>
+            </b-form-group>
+            <b-form-group label="Verify New Password:" label-for="input-confirm-password">
+                <b-form-input id="input-confirm-password" 
+                type="password" 
+                v-model="confirmedPassword"
+                :class="{'is-invalid': !passwordMatch}"
+                placeholder="Please input your password"></b-form-input>
+            </b-form-group>
+            <div v-if="!passwordMatch" class="invalid-feedback" style="display: block;">
+                Password inconsistent
+            </div>
+            <b-form-group label="Update Email:" label-for="input-email">
+              <b-form-input id="input-email" type="email" v-model="form.email" placeholder="Please input your email"></b-form-input>
+            </b-form-group>
+            <b-button type="submit" variant="primary">Submit</b-button>
+          </b-form>
+          <b-button @click="backToLobby">Return</b-button>
+        </div>
+
       </div>
     </div>
   </div>
@@ -40,28 +45,30 @@ import { Data } from '../data';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const confirmedPassword = ref('');
-const user = ref({
-    avatar: '/public/uploads/avatar.png',
-    name: '张三',
-    games: 10,
-    winRate: 70,
-    email: ""
-});
-const form = ref({
-    password: '',
-    email: '',
-    newPassword: '',
-    avatar: '/public/uploads/avatar.png',
-});
+    const confirmedPassword = ref('');
+    const user = ref({
+        avatar: '/public/uploads/avatar.png',
+      name: 'Guest',
+      games: 10,
+        winRate: 70,
+        email:""
+    });
+    const form = ref({
+      password: '',
+      email: '',
+      newPassword: '',
 
-const passwordMatch = computed(() => form.value.newPassword === confirmedPassword.value);
+      avatar: '/public/uploads/avatar.png',
+    });
 
-onMounted(async () => {
-    const ret = await Data.fetchUserProfile("321", localStorage.getItem('token') as string);
-    user.value = {
-        avatar: ret.avatar || '../assets/images.png',
-        name: ret.username,
+    const passwordMatch = computed(() => form.value.newPassword=== confirmedPassword.value);
+
+    onMounted(async () => {
+      const ret = await Data.fetchUserProfileNew("321", localStorage.getItem('token') as string);
+      user.value = {
+        avatar: ret.avatar || '../assets/images.png', 
+        name: ret.username, 
+
         games: ret.totalGame,
         winRate: ret.winRate,
         email: ret.email

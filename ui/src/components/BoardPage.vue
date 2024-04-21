@@ -77,6 +77,7 @@
   import { routerKey, useRoute, useRouter } from 'vue-router';
   import { Data } from '../data';
   import ProfileBlock from './ProfileBlock.vue';
+  import axios from 'axios';
   const router = useRouter();
   const route = useRoute();
   const roomId = route.query.roomId;
@@ -105,7 +106,7 @@ const user2 = ref({
   let timer = null;
   
   // 初始化棋盘
-  const gameSocket = new GameSocket('http://localhost:8181', localStorage.getItem('token'));
+  const gameSocket = new GameSocket('http://localhost:30002', localStorage.getItem('token'));
   onMounted(() => {
     // initialize the chessboard
     for (let i = 0; i < 15; i++) {
@@ -143,8 +144,22 @@ function updateGameState(board, round) {
 
 }
 
-function leaveRoom() {
+async function removePlayerFromRoom(roomId, playerName) {
+    axios.post(`/api/rooms/players/remove`, { roomId:roomId,playerName: playerName })
+    .then((res) => {
+      console.log(`removing statusCode!!!!!!!!!!!: ${res.status}`);
+      // console.log(res.data);
+    }
+    ).catch((error) => {
+      console.error("error removing player from room:", error.message);
+    });
+  }
+
+async function leaveRoom() {
+  await removePlayerFromRoom(roomId, userId);
   router.push('/');
+
+  
 }
 
   // 计时器函数

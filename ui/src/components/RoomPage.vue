@@ -4,7 +4,7 @@
       <!-- Outer Row for User/Empty section and Profile/Chat -->
       <b-row class="h-100">
         <!-- User/Empty Section -->
-        <b-col cols="8" class="d-flex flex-column align-items-center justify-content-center bg-primary text-white">
+        <b-col md="8" class="d-flex flex-column align-items-center justify-content-center bg-primary text-white">
             <b-avatar :src="user1.avatar" size="6rem" class="mb-2"></b-avatar>
             <h2 class="mb-2">{{ user1.name }}</h2>
         <b-button variant="success" class="w-25 mb-4" @click="startGame">Start</b-button>
@@ -14,12 +14,10 @@
         </b-col>
   
         <!-- Profile/Chat Section -->
-        <b-col cols="4" class="bg-secondary">
-          <ProfileBlock :user="user1" :enable-edit="false" />
+        <b-col md="4" class="bg-secondary">
+          <ProfileBlock :user="user1.name == userName ? user1 : user2" :enable-edit="false" />
           <b-card no-body class="h-50 bg-info">
-            <b-card-header class="h-100 d-flex align-items-center justify-content-center">
-              More Profile or A chat room
-            </b-card-header>
+            <RankBlock />
           </b-card>
         </b-col>
       </b-row>
@@ -32,6 +30,7 @@
 import { onMounted, ref } from 'vue';
 import { GameSocket } from '../gameSocket'; 
 import { useRouter } from 'vue-router';
+import RankBlock from './RankBlock.vue';
 import ProfileBlock from './ProfileBlock.vue';
 
 
@@ -77,7 +76,7 @@ const user2 = ref({
 
 
 
-const gameSocket = new GameSocket('http://localhost:8181', localStorage.getItem('token') as string);
+const gameSocket = new GameSocket('http://localhost:30002', localStorage.getItem('token') as string);
 
 onMounted(async () => {
 

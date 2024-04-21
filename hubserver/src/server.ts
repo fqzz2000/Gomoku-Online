@@ -93,7 +93,7 @@ Issuer.discover("https://coursework.cs.duke.edu/").then(issuer => {
   const params = {
     scope: 'openid profile email',
     nonce: generators.nonce(),
-    redirect_uri: 'http://localhost:8131/login-callback',
+    redirect_uri: 'http://localhost:30001/login-callback',
     state: generators.state(),
   }
   
@@ -144,6 +144,11 @@ app.get('/api/users/:username', authenticateJWT, (req, res) => {
   } else {
       res.status(401).send("Unauthorized");
   }
+});
+
+app.get('/api/users/new/:username', (req, res) => {
+  console.log("reached api/user end");
+  userController.getUserProfileNew(req, res);
 });
 
 
@@ -214,6 +219,10 @@ app.post('/api/logout', (req, res) => {
     res.redirect('http://localhost:5173/login'); 
   });
 });
+
+app.get('/api/rank', async (req: Request, res: Response) => {
+  userController.getRank(req, res);
+})
 
 
 
