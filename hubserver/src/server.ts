@@ -93,7 +93,7 @@ Issuer.discover("https://coursework.cs.duke.edu/").then(issuer => {
   const params = {
     scope: 'openid profile email',
     nonce: generators.nonce(),
-    redirect_uri: 'http://localhost:8131/login-callback',
+    redirect_uri: 'http://localhost:30001/login-callback',
     state: generators.state(),
   }
   

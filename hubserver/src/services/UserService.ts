@@ -7,7 +7,7 @@ export class UserService {
     try {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
-      const doc = await User.findOneAndUpdate({username}, {password: hashedPassword, email, avatar}).exec();
+      const doc = await User.findOneAndUpdate({username}, {password: hashedPassword, email: email, avatar: avatar}).exec();
       console.log("update user profile: ", doc)
       return await User.findOne({username}).exec();
     } catch (error) {

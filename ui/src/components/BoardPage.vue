@@ -105,7 +105,7 @@ const user2 = ref({
   let timer = null;
   
   // 初始化棋盘
-  const gameSocket = new GameSocket('http://localhost:8181', localStorage.getItem('token'));
+  const gameSocket = new GameSocket('http://localhost:30002', localStorage.getItem('token'));
   onMounted(() => {
     // initialize the chessboard
     for (let i = 0; i < 15; i++) {

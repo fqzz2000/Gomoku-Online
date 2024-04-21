@@ -25,22 +25,26 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:8131', 
+        // target: 'http://localhost:8131', 
+        target : "http://localhost:30001",
         changeOrigin: true,
         // rewrite: (path) => path.replace(/^\/api/, '')
       },
       "/public": {
-        target: "http://localhost:8131",
+        // target: "http://localhost:8131",
+        target : "http://localhost:30001",
         changeOrigin: true,
         // rewrite: (path) => path.replace(/^\/public/, '')
       },
       "/login/oidc": {
-        target: 'http://localhost:8131',
+        // target: 'http://localhost:8131',
+        target : "http://localhost:30001",
         changeOrigin: true,
        // rewrite: path => path.replace(/^\/login\/oidc/, '/login/oidc')
       },
       '/game': {
-        target: 'http://localhost:8181', 
+        // target: 'http://localhost:8181', 
+        target : "http://localhost:30002",
         changeOrigin: true,
         ws: true, 
       },

@@ -76,7 +76,7 @@ const user2 = ref({
 
 
 
-const gameSocket = new GameSocket('http://localhost:8181', localStorage.getItem('token') as string);
+const gameSocket = new GameSocket('http://localhost:30002', localStorage.getItem('token') as string);
 
 onMounted(async () => {
 

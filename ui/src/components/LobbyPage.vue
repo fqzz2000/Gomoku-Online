@@ -20,10 +20,8 @@
       <!-- User Profile/Chat Section -->
       <b-col md="4">
         <ProfileBlock :user="user" :enable-edit="true" :enable-upload="false"/>
-<<<<<<< HEAD
         <b-button variant="danger" @click="logout">Logout</b-button>
-=======
->>>>>>> 2b23bd8 (abstractout profile block)
+
 
         <b-card no-body header="More Profile or A chat room">
           <!-- Chat or profile content here -->
