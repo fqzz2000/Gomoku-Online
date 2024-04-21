@@ -5,6 +5,7 @@ COPY *.js* ./
 COPY *.ts* ./
 COPY src/ ./src/
 COPY *.json ./
+COPY public/ ./public/
 RUN npm i
 RUN ls -al && npm run build
 ENTRYPOINT [ "node", "dist/server.js" ]

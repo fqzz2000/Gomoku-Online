@@ -146,6 +146,11 @@ app.get('/api/users/:username', authenticateJWT, (req, res) => {
   }
 });
 
+app.get('/api/users/new/:username', (req, res) => {
+  console.log("reached api/user end");
+  userController.getUserProfileNew(req, res);
+});
+
 
 
 app.post('/api/register', registerUser);
@@ -214,6 +219,10 @@ app.post('/api/logout', (req, res) => {
     res.redirect('http://localhost:5173/login'); 
   });
 });
+
+app.get('/api/rank', async (req: Request, res: Response) => {
+  userController.getRank(req, res);
+})
 
 
 

@@ -9,7 +9,7 @@
             <!-- Use v-for to list rooms here -->
             <b-list-group-item button v-for="room in rooms" :key="room.id" @click="enterRoom(room)">
               Room {{ room.number }} - Player: {{ room.players.join(', ') }}  [{{ room.status }}]
-              <!--b-button variant="danger" class="float-right" @click.stop="deleteRoom(room.id)">Delete</b-button-->
+              <b-button variant="danger" class="float-right" @click.stop="deleteRoom(room.id)">Delete</b-button>
             </b-list-group-item>
           </b-list-group>
         </b-card>
@@ -20,12 +20,14 @@
       <!-- User Profile/Chat Section -->
       <b-col md="4">
         <ProfileBlock :user="user" :enable-edit="true" :enable-upload="false"/>
-        <b-button variant="danger" @click="logout">Logout</b-button>
 
 
-        <b-card no-body header="More Profile or A chat room">
-          <!-- Chat or profile content here -->
+
+        <b-card no-body header="LeaderBoard">
+         
+        <RankBlock />
         </b-card>
+        <b-button variant="danger" @click="logout" class="mb-3 mt-3">Logout</b-button>
 
       </b-col>
     </b-row>
@@ -40,6 +42,7 @@
   import { useRouter } from 'vue-router';
   import { getWithToken, postWithToken, deleteWithToken } from '../utils';
   import ProfileBlock from './ProfileBlock.vue';
+  import RankBlock from './RankBlock.vue';
   const router = useRouter();
 
 
@@ -71,10 +74,10 @@ const rooms = ref<Room[]>([]);
 
 
 
+
   async function fetchUserInfo() {
     try {
-
-      const username = "xsasa";
+      const username = "haha"
       
       console.log('User info is fetching');
       const response = await getWithToken(`/api/users/${username}`, localStorage.getItem('token') as string);

@@ -71,18 +71,36 @@ export class UserController {
   constructor() {
     this.userService = new UserService();
   }
-
+  public async getRank(req: Request, res: Response): Promise<void> {
+    try {
+      const rank = await this.userService.getRank();
+      res.status(200).json(rank);
+    } catch (error) {
+      console.error('Error getting rank:', error);
+      if (error instanceof Error) {
+        res.status(500).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'An unknown error occurred' });
+      }
+    }
+  }
   public async updateUserProfile(req: Request, res: Response): Promise<void> {
     console.log('Request received');
-    const { password, email, avatar, newPassword } = req.body;
+    let { password, email, avatar, newPassword } = req.body;
     const username = req.user.username;
     const user = await User.findOne({ username }).exec();
-    if (!(user && await bcrypt.compare(password, user.password))) {
-      res.status(401).json({ message: 'Authentication failed' });
-      return;
-    }
+    // if (!(user && await bcrypt.compare(password, user.password))) {
+    //   res.status(401).json({ message: 'Authentication failed' });
+    //   return;
+    // }
 
     console.log('start to update user: ', user.username);
+    if (!email) {
+      email = user.email;
+    }
+    if (!avatar) {
+      avatar = user.avatar;
+    }
     try {
 
       const user = await this.userService.updateUserProfile(username, newPassword, email, avatar);
@@ -124,12 +142,36 @@ export class UserController {
     }
   }
 
+  public async getUserProfileNew(req: Request, res: Response): Promise<void> {
+    try {
+      let username = req.params.username;// const username=req.user.username;
+      console.log('start to get user: ', username);
+      const user = await this.userService.getUserByUsername(username);
+      console.log('User found:', user);
+
+      if (!user) {
+        res.status(404).json({ message: 'User not found' });
+        console.log('User not found');
+        return;
+      }
+
+      res.json(user);
+    } catch (error) {
+      console.error('Error getting user:', error);
+      if (error instanceof Error) {
+        res.status(500).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'An unknown error occurred' });
+    }
+  }
+  }
   public async getUserProfile(req: Request, res: Response): Promise<void> {
     try {
       console.log('Request received');
+      let username;
+      username = req.user.username;
 
-     // const username = req.params.username;
-      const username=req.user.username;
+      // const username=req.user.username;
       console.log('start to get user: ', username);
       const user = await this.userService.getUserByUsername(username);
       console.log('User found:', user);
