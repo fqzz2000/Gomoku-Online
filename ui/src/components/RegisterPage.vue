@@ -1,7 +1,9 @@
 <template>
-  <div class="register-container">
-    <h2>Register</h2>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <div class="register-container" register>
+ 
     <form @submit.prevent="registerUser" class="login-form">
+      <h2>Register</h2>
       <div class="form-group">
         <label for="username">Username</label>
         <input v-model="username" type="text" id="username" required>
@@ -16,6 +18,7 @@
       </div>
 
       <button type="submit">Register</button>
+      <button type="button" @click="goHome">Back to Home</button>
     </form>
   </div>
 </template>
@@ -54,6 +57,9 @@ export default {
         alert(errorMessage);
       }
     },
+    goHome() {
+      this.$router.push('/home'); // Redirect to the home page
+    }
   },
 };
 </script>
@@ -61,63 +67,74 @@ export default {
 <style>
 /* 使用之前定义的相同风格 */
 .register-container {
+
+
+  
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   height: 100vh;
-  background-color: #FADADD;
+}
+
+body {
+  background-image: url('../assets/loginpage.png'); /* 设置背景图片 */
+  background-size: cover; /* 覆盖整个可视区域 */
+  background-position: center; /* 图片居中显示 */
+  background-repeat: no-repeat; /* 不重复图片 */
+  background-color: #fff; /* 设置一个基础背景颜色以防图片加载慢 */
 }
 
 .login-form {
   padding: 20px;
-  background: #D78B9B;
+  background: hsla(209, 53%, 12%, 0.49);
+  color: #ffffff;
+
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
-  color: #ffffff;
+  text-align: center;
 }
 
 .form-group {
   margin-bottom: 1.5rem;
 }
 
-label {
+.register label {
   display: block;
   margin-bottom: .5rem;
   color: #ffffff;
 }
 
-input[type="text"],
-input[type="password"],
+ input[type="text"],
+ input[type="password"],
 input[type="email"] {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #BDA0BC;
-  border-radius: 4px;
-  background-color: #E9D6DF;
-  color: #5A3A4A;
+    padding: 0.75rem;
+    border: 3px solid #05082f8c;
+    border-radius: 10px;
+    background-color: #020213ab;
+    color: #ffffff;
 }
 
-button {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #729FCF;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+ button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #6586a973;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 button:hover {
-  background-color: #567BAE;
+  background-color: #475262; /* 按钮hover效果颜色 */
 }
 
 h2 {
-  color: #333;
-  
-  margin-bottom: 2rem;
+    color: #fff;
+    margin-bottom: 2rem;
 }
 </style>

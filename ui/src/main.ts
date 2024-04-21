@@ -41,6 +41,11 @@ const routes = [
         
     },
     {
+      path: '/home',
+      name: 'Home',
+      component: () => import('./components/HomePage.vue')
+  }, 
+    {
         path: '/room/:roomId',
         name: 'Room',
         component: () => import('./components/RoomPage.vue')

@@ -10,6 +10,7 @@
 </template> -->
 
 <template>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <b-card class="mb-3 shadow-sm" header="User Profile" header-bg-variant="primary" header-text-variant="white" align="center">
       <b-avatar :src="user.avatar" size="6rem" class="mb-3" @click="triggerFileInput"></b-avatar>
       <!-- Hidden file input for selecting files -->
@@ -89,3 +90,11 @@ async function toEdit() {
 }
 
 </script>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif; /* 使用Poppins字体 */
+}
+</style>
